@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { toast } from '@/store/toast';
 import { brandPalette, contrastRatio } from '@/lib/theme';
@@ -66,6 +66,7 @@ function LogoAndColours() {
   const updateBrand = useAppStore((s) => s.updateBrand);
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  const [confirmLogo, setConfirmLogo] = useState(false);
 
   const color = brand.brandColor;
   const preset = SWATCHES.find((s) => s.hex.toLowerCase() === color.toLowerCase());
@@ -81,7 +82,10 @@ function LogoAndColours() {
       updateBrand({ logoDataUrl: url });
       toast({ text: 'Logo changed', tone: 'success' });
     } catch (e) {
-      toast({ text: e instanceof Error ? e.message : 'Could not use this picture.', tone: 'error' });
+      toast({
+        text: e instanceof Error ? e.message : 'Could not use this picture.',
+        tone: 'error',
+      });
     } finally {
       setBusy(false);
     }
@@ -117,10 +121,21 @@ function LogoAndColours() {
           })}
           <label className="relative flex cursor-pointer flex-col items-center gap-1 rounded-2xl p-1 text-[13px] font-medium text-ink hover:bg-paper-sunk focus-within:outline focus-within:outline-2 focus-within:outline-brand">
             <span
-              className={clsx('flex h-12 w-12 items-center justify-center rounded-[14px] border-2 border-dashed border-paper-strong ring-offset-2', !preset && 'ring-2 ring-ink')}
+              className={clsx(
+                'flex h-12 w-12 items-center justify-center rounded-[14px] border-2 border-dashed border-paper-strong ring-offset-2',
+                !preset && 'ring-2 ring-ink',
+              )}
               style={!preset ? { background: color } : undefined}
             >
-              {!preset ? <span className="text-white" aria-hidden="true">✓</span> : <span aria-hidden="true" className="text-xl text-ink-muted">+</span>}
+              {!preset ? (
+                <span className="text-white" aria-hidden="true">
+                  ✓
+                </span>
+              ) : (
+                <span aria-hidden="true" className="text-xl text-ink-muted">
+                  +
+                </span>
+              )}
             </span>
             Custom
             <input
@@ -151,11 +166,6 @@ function LogoAndColours() {
             <Button variant="secondary" onClick={() => fileRef.current?.click()} disabled={busy}>
               Change logo
             </Button>
-            {logoSource(brand) && (
-              <Button variant="ghost" onClick={() => updateBrand({ logoDataUrl: '' })}>
-                Remove logo
-              </Button>
-            )}
             {brand.logoDataUrl !== null && (
               <Button variant="ghost" onClick={() => updateBrand({ logoDataUrl: null })}>
                 Use default logo
@@ -163,6 +173,30 @@ function LogoAndColours() {
             )}
           </div>
         </div>
+        {logoSource(brand) && (
+          <div className="border-t border-paper-line pt-2">
+            <button
+              type="button"
+              onClick={() => setConfirmLogo(true)}
+              className="min-h-[44px] rounded-lg px-1 text-[15px] font-semibold text-danger underline underline-offset-2 hover:bg-paper-sunk"
+            >
+              Remove logo
+            </button>
+          </div>
+        )}
+        <ConfirmDialog
+          open={confirmLogo}
+          title="Remove the logo?"
+          message="Your PDF will have no logo. You can add one again with Change logo."
+          confirmLabel="Yes, remove logo"
+          danger
+          onCancel={() => setConfirmLogo(false)}
+          onConfirm={() => {
+            setConfirmLogo(false);
+            updateBrand({ logoDataUrl: '' });
+            toast({ text: 'Logo removed' });
+          }}
+        />
         <input
           ref={fileRef}
           type="file"
@@ -191,14 +225,11 @@ function LogoAndColours() {
   );
 }
 
-function PdfText() {
+function ContactDetails() {
   const brand = useAppStore((s) => s.brand);
   const updateBrand = useAppStore((s) => s.updateBrand);
   return (
-    <Section id="pdf-h" title="PDF text">
-      <Field label="Business name" value={brand.businessName} onChange={(e) => updateBrand({ businessName: e.target.value })} autoComplete="off" />
-      <Field label="Client PDF title" value={brand.clientPdfTitle} onChange={(e) => updateBrand({ clientPdfTitle: e.target.value })} autoComplete="off" />
-      <Field label="Chef PDF title" value={brand.chefPdfTitle} onChange={(e) => updateBrand({ chefPdfTitle: e.target.value })} autoComplete="off" />
+    <Section id="contact-h" title="Contact details">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Contact name" value={brand.contactName} onChange={(e) => updateBrand({ contactName: e.target.value })} autoComplete="off" />
         <Field
@@ -210,6 +241,40 @@ function PdfText() {
           autoComplete="off"
         />
       </div>
+    </Section>
+  );
+}
+
+/** Quiet "✓ Saved" note that appears for ~2 s whenever the settings change. */
+function SavedNote() {
+  const brand = useAppStore((s) => s.brand);
+  const assistant = useAppStore((s) => s.assistant);
+  const [show, setShow] = useState(false);
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    setShow(true);
+    const t = window.setTimeout(() => setShow(false), 2000);
+    return () => window.clearTimeout(t);
+  }, [brand, assistant]);
+  return (
+    <span role="status" className="pr-3 text-sm font-semibold text-brand-dark">
+      {show ? <span aria-hidden="false">✓ Saved</span> : null}
+    </span>
+  );
+}
+
+function PdfText() {
+  const brand = useAppStore((s) => s.brand);
+  const updateBrand = useAppStore((s) => s.updateBrand);
+  return (
+    <Section id="pdf-h" title="PDF text">
+      <Field label="Business name" value={brand.businessName} onChange={(e) => updateBrand({ businessName: e.target.value })} autoComplete="off" />
+      <Field label="Client PDF title" value={brand.clientPdfTitle} onChange={(e) => updateBrand({ clientPdfTitle: e.target.value })} autoComplete="off" />
+      <Field label="Chef PDF title" value={brand.chefPdfTitle} onChange={(e) => updateBrand({ chefPdfTitle: e.target.value })} autoComplete="off" />
       <TextArea
         label="Payment terms"
         hint="One line for each point. Leave empty to hide."
@@ -230,7 +295,7 @@ export default function SettingsScreen() {
 
   return (
     <div className="min-h-dvh bg-paper pb-12">
-      <PageHeader title="Settings" subtitle="Logo, colours, PDF text and backup" backTo="/" backLabel="Back to events" />
+      <PageHeader title="Settings" subtitle="Logo, colours, PDF text and backup" backTo="/" backLabel="Back to events" right={<SavedNote />} />
       <div className="mx-auto grid w-full max-w-2xl gap-6 px-5 py-6 lg:max-w-5xl lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-10">
         <div className="lg:order-2 lg:sticky lg:top-[76px]">
           <p className="mb-2 text-[15px] font-semibold">How your PDF looks</p>
@@ -239,6 +304,7 @@ export default function SettingsScreen() {
 
         <div className="flex min-w-0 flex-col gap-8 lg:order-1">
           <LogoAndColours />
+          <ContactDetails />
           <PdfText />
 
           <Section id="claude-h" title="Claude assistant">

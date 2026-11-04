@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import type { CateringEvent } from '@/types';
 import { PageHeader, useScrollTop } from './components/ui';
+import { IconWarning } from '@/components/ui/icons';
 
 type StartFrom = 'copy' | 'wedding' | 'blank';
 const MAX_DAYS = 10;
@@ -35,7 +36,11 @@ function copyFromEvent(src: CateringEvent, name: string, dates: string[], locati
       ...old,
       id: newId('dy'),
       date,
-      sessions: old.sessions.map((s) => ({ ...s, id: newId('se'), entries: s.entries.map((en) => ({ ...en, id: newId('en') })) })),
+      sessions: old.sessions.map((s) => ({
+        ...s,
+        id: newId('se'),
+        entries: s.entries.map((en) => ({ ...en, id: newId('en') })),
+      })),
     };
   });
   return {
@@ -48,6 +53,27 @@ function copyFromEvent(src: CateringEvent, name: string, dates: string[], locati
     createdAt: now,
     updatedAt: now,
   };
+}
+
+const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** "2027-03-10" -> "Wed, 10 Mar 2027 (10-03-2027)" */
+function dateReadout(iso: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!m) return '';
+  const d = new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3])));
+  if (Number.isNaN(d.getTime())) return '';
+  return `${WEEKDAYS[d.getUTCDay()]}, ${Number(m[3])} ${MONTHS[d.getUTCMonth()]} ${m[1]} (${fromIsoDate(iso)})`;
+}
+
+function DateReadout({ iso }: { iso: string }) {
+  return (
+    <div className="mt-1.5 text-[15px]" aria-live="polite">
+      {iso && <p className="font-semibold text-ink">{dateReadout(iso)}</p>}
+      <p className="text-sm text-ink-muted">Tap to pick from the calendar</p>
+    </div>
+  );
 }
 
 interface Errors {
@@ -69,7 +95,7 @@ export default function NewEventScreen() {
   const [location, setLocation] = useState('');
   const [clientName, setClientName] = useState('');
   const [clientPhone, setClientPhone] = useState('');
-  const [start, setStart] = useState<StartFrom>('wedding');
+  const [start, setStart] = useState<StartFrom>(events.length > 0 ? 'copy' : 'wedding');
   const [copyId, setCopyId] = useState<string>(events[0]?.id ?? '');
   const [errors, setErrors] = useState<Errors>({});
 
@@ -106,17 +132,31 @@ export default function NewEventScreen() {
   };
 
   const days = from && to ? isoRange(from, to).length : 0;
+  const copySrc = start === 'copy' ? events.find((x) => x.id === copyId) : undefined;
+  const lost = copySrc && days > 0 && days <= MAX_DAYS ? copySrc.days.map((day, i) => ({ day, n: i + 1 })).filter(({ n }) => n > days) : [];
 
   const options: { value: StartFrom; title: string; text: string }[] = [
-    { value: 'copy', title: 'Copy an old event', text: 'Same days, meals and dishes. You change what is different.' },
-    { value: 'wedding', title: 'Wedding template', text: 'Tiffin, lunch, snacks and dinner with empty menus.' },
-    { value: 'blank', title: 'Blank', text: 'Start with nothing and add your own meals.' },
+    {
+      value: 'copy',
+      title: 'Copy an old event',
+      text: 'Same days, meals and dishes. You change what is different.',
+    },
+    {
+      value: 'wedding',
+      title: 'Wedding template',
+      text: 'Tiffin, lunch, snacks and dinner with empty menus.',
+    },
+    {
+      value: 'blank',
+      title: 'Blank',
+      text: 'Start with nothing and add your own meals.',
+    },
   ];
 
   return (
-    <div className="min-h-dvh bg-paper pb-10">
+    <div className="flex min-h-dvh flex-col bg-paper">
       <PageHeader title="New event" backTo="/" backLabel="Back to events" />
-      <form onSubmit={submit} noValidate className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-5 py-6">
+      <form onSubmit={submit} noValidate className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-5 px-5 pt-6">
         <Field
           label="Event name"
           value={name}
@@ -129,40 +169,31 @@ export default function NewEventScreen() {
         />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Field
-            label="From"
-            type="date"
-            value={from}
-            onChange={(e) => {
-              const v = e.target.value;
-              setFrom(v);
-              if (!to || to < v) setTo(v);
-            }}
-            aria-required="true"
-            error={errors.from}
-          />
-          <Field label="To" type="date" value={to} min={from || undefined} onChange={(e) => setTo(e.target.value)} aria-required="true" error={errors.to} />
+          <div>
+            <Field
+              label="From"
+              type="date"
+              value={from}
+              onChange={(e) => {
+                const v = e.target.value;
+                setFrom(v);
+                if (!to || to < v) setTo(v);
+              }}
+              aria-required="true"
+              error={errors.from}
+            />
+            <DateReadout iso={from} />
+          </div>
+          <div>
+            <Field label="To" type="date" value={to} min={from || undefined} onChange={(e) => setTo(e.target.value)} aria-required="true" error={errors.to} />
+            <DateReadout iso={to} />
+          </div>
         </div>
         {days > 0 && days <= MAX_DAYS && !errors.to && (
           <p className="-mt-3 text-[15px] text-ink-muted">
             {days} {days === 1 ? 'day' : 'days'}: one Day is made for each date.
           </p>
         )}
-
-        <Field label="Location" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="For example: Avadi" autoComplete="off" />
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Field label="Client name" hint="Optional. Printed on the quote." value={clientName} onChange={(e) => setClientName(e.target.value)} autoComplete="off" />
-          <Field
-            label="Client phone"
-            hint="Optional. Printed on the quote."
-            type="tel"
-            inputMode="tel"
-            value={clientPhone}
-            onChange={(e) => setClientPhone(e.target.value)}
-            autoComplete="off"
-          />
-        </div>
 
         <fieldset className="flex flex-col gap-3">
           <legend className="mb-1 font-display text-lg font-semibold">Start the menu from</legend>
@@ -215,7 +246,9 @@ export default function NewEventScreen() {
 
         {start === 'copy' && (
           <div role="radiogroup" aria-labelledby="copy-h" className="flex flex-col gap-2 rounded-[18px] bg-white p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-            <h3 id="copy-h" className="font-display text-base font-semibold">Which event do you want to copy?</h3>
+            <h3 id="copy-h" className="font-display text-base font-semibold">
+              Which event do you want to copy?
+            </h3>
             {events.length === 0 ? (
               <p className="text-ink-muted">You have no old events yet. Choose Wedding template or Blank.</p>
             ) : (
@@ -246,12 +279,48 @@ export default function NewEventScreen() {
             )}
             {errors.copy && <p className="text-sm font-medium text-danger">{errors.copy}</p>}
             <p className="text-sm text-ink-muted">Days are moved to your new dates in order. Extra dates start empty.</p>
+            {lost.length > 0 && (
+              <div role="alert" className="flex flex-col gap-1 rounded-xl bg-warn-soft p-3 text-[15px] font-medium text-warn">
+                {lost.map(({ day, n }) => (
+                  <p key={day.id} className="flex items-start gap-1.5">
+                    <IconWarning size={18} className="mt-0.5 shrink-0" />
+                    <span>
+                      Day {n} ({day.date}
+                      {day.title && day.title !== `Day ${n}` ? `, ${day.title}` : ''}) will not be copied — add another date to keep it.
+                    </span>
+                  </p>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
-        <Button type="submit" size="lg" block>
-          Create event
-        </Button>
+        <Field label="Location" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="For example: Avadi" autoComplete="off" />
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Field
+            label="Client name"
+            hint="Optional. Printed on the quote."
+            value={clientName}
+            onChange={(e) => setClientName(e.target.value)}
+            autoComplete="off"
+          />
+          <Field
+            label="Client phone"
+            hint="Optional. Printed on the quote."
+            type="tel"
+            inputMode="tel"
+            value={clientPhone}
+            onChange={(e) => setClientPhone(e.target.value)}
+            autoComplete="off"
+          />
+        </div>
+
+        <div className="sticky bottom-0 z-20 -mx-5 mt-auto border-t border-paper-line bg-white px-5 pb-[calc(12px+env(safe-area-inset-bottom))] pt-3 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+          <Button type="submit" size="lg" block>
+            Create event
+          </Button>
+        </div>
       </form>
     </div>
   );

@@ -18,7 +18,7 @@ type PricingMode = Pricing['mode'];
 const PRICING_OPTIONS: { value: PricingMode; label: string }[] = [
   { value: 'perLeaf', label: 'Per plate' },
   { value: 'fixed', label: 'Fixed amount' },
-  { value: 'excluded', label: 'Not included in total' },
+  { value: 'excluded', label: 'Not in total' },
 ];
 
 function Check({ id, label, checked, onChange }: { id: string; label: string; checked: boolean; onChange: (v: boolean) => void }) {
@@ -188,13 +188,13 @@ export default function SessionScreen() {
 
   return (
     <div className="pb-6">
-      <div className="sticky top-[61px] z-20 border-b border-paper-line bg-white md:top-[61px]">
+      <div className="sticky top-[var(--event-header-h,61px)] z-20 border-b border-paper-line bg-white">
         <div className="flex items-center gap-1 px-2 py-2">
           <Link to={menuUrl} aria-label="Back to menu" className="flex h-11 w-11 items-center justify-center rounded-xl text-ink hover:bg-paper-sunk">
             <IconBack />
           </Link>
           <h1 className="flex-1 font-display text-lg font-semibold">Edit this meal</h1>
-          <ButtonLink to={menuUrl} className="min-h-[44px]">
+          <ButtonLink to={menuUrl} className="mr-2 min-h-[44px] px-5">
             Done
           </ButtonLink>
         </div>
@@ -203,48 +203,11 @@ export default function SessionScreen() {
       <div className="flex flex-col gap-5 px-4 py-5">
         <Field label="Meal name" value={s.name} onChange={(e) => updateSession(event.id, s.id, { name: e.target.value })} autoComplete="off" />
 
-        <div role="group" aria-labelledby="icon-label" className="flex flex-col gap-2">
-          <span id="icon-label" className="text-[15px] font-semibold">
-            Picture
-          </span>
-          <div className="flex flex-wrap gap-2">
-            {SESSION_ICONS.map((o) => (
-              <button
-                key={o.icon}
-                type="button"
-                aria-label={o.label}
-                aria-pressed={s.icon === o.icon}
-                title={o.label}
-                onClick={() => updateSession(event.id, s.id, { icon: o.icon })}
-                className={clsx(
-                  'flex h-12 w-12 items-center justify-center rounded-xl border-2 text-2xl',
-                  s.icon === o.icon ? 'border-brand bg-brand-tint' : 'border-paper-line bg-white hover:bg-paper-sunk',
-                )}
-              >
-                <span aria-hidden="true">{o.icon}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
         <Card className="flex flex-col gap-3">
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="meal-time" className="text-[15px] font-semibold">
-              Time
-            </label>
-            <input
-              id="meal-time"
-              type="time"
-              disabled={s.time == null}
-              value={s.time ?? ''}
-              onChange={(e) => e.target.value && updateSession(event.id, s.id, { time: e.target.value })}
-              className={clsx(inputClass, 'disabled:bg-paper-sunk disabled:text-ink-faint')}
-            />
-            <Check id="no-time" label="No fixed time" checked={s.time == null} onChange={(v) => updateSession(event.id, s.id, { time: v ? null : '12:00' })} />
-          </div>
-
           <div className="flex flex-col gap-1">
-            {s.people != null && <NumberStepper label="People" value={s.people} step={10} allowEmpty={false} onChange={(v) => updateSession(event.id, s.id, { people: v ?? 0 })} />}
+            {s.people != null && (
+              <NumberStepper label="People" value={s.people} step={10} allowEmpty={false} onChange={(v) => updateSession(event.id, s.id, { people: v ?? 0 })} />
+            )}
             <Check
               id="unlimited"
               label={s.people == null ? 'Unlimited (no fixed number of people)' : 'Unlimited'}
@@ -257,6 +220,9 @@ export default function SessionScreen() {
         <Card className="flex flex-col gap-3">
           <span className="text-[15px] font-semibold">How is this meal priced?</span>
           <Segmented label="Pricing" value={s.pricing.mode} options={PRICING_OPTIONS} onChange={setMode} />
+          {s.pricing.mode === 'excluded' && (
+            <p className="text-sm text-ink-muted">“Not in total” means this meal is shown on the menu but its price is left out of the grand total.</p>
+          )}
           {s.pricing.mode === 'perLeaf' && (
             <NumberStepper
               label="Price per plate (leaf)"
@@ -264,7 +230,11 @@ export default function SessionScreen() {
               value={s.pricing.rate}
               step={10}
               allowEmpty
-              onChange={(v) => updateSession(event.id, s.id, { pricing: { mode: 'perLeaf', rate: v } })}
+              onChange={(v) =>
+                updateSession(event.id, s.id, {
+                  pricing: { mode: 'perLeaf', rate: v },
+                })
+              }
             />
           )}
           {s.pricing.mode === 'fixed' && (
@@ -274,11 +244,18 @@ export default function SessionScreen() {
               value={s.pricing.amount}
               step={1000}
               allowEmpty
-              onChange={(v) => updateSession(event.id, s.id, { pricing: { mode: 'fixed', amount: v } })}
+              onChange={(v) =>
+                updateSession(event.id, s.id, {
+                  pricing: { mode: 'fixed', amount: v },
+                })
+              }
             />
           )}
           <div
-            className={clsx('flex items-center justify-between gap-2 rounded-xl px-3 py-3', missing ? 'bg-warn-soft text-warn' : 'bg-brand-soft text-brand-dark')}
+            className={clsx(
+              'flex items-center justify-between gap-2 rounded-xl px-3 py-3',
+              missing ? 'bg-warn-soft text-warn' : 'bg-brand-soft text-brand-dark',
+            )}
           >
             <span className="text-[15px] font-semibold">Total for this meal</span>
             <span className="font-display text-xl font-bold" data-testid="session-total">
@@ -333,31 +310,89 @@ export default function SessionScreen() {
           </div>
         </section>
 
-        {event.days.length > 1 && (
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="move-day" className="text-[15px] font-semibold">
-              Day for this meal
-            </label>
-            <select
-              id="move-day"
-              className={inputClass}
-              value={day.id}
-              onChange={(e) => {
-                const target = event.days.find((d) => d.id === e.target.value);
-                if (!target || target.id === day.id) return;
-                moveSessionToDay(event.id, s.id, target.id);
-                toast({ text: `Moved ${s.name} to ${shortDate(target.date)}` });
-              }}
-            >
-              {event.days.map((d, i) => (
-                <option key={d.id} value={d.id}>
-                  Day {i + 1} · {shortDate(d.date)}
-                  {d.title ? ` · ${d.title}` : ''}
-                </option>
-              ))}
-            </select>
+        <details className="group rounded-2xl border border-paper-line bg-white">
+          <summary className="flex min-h-[52px] cursor-pointer list-none items-center justify-between gap-2 rounded-2xl px-4 text-base font-semibold marker:hidden [&::-webkit-details-marker]:hidden">
+            <span>
+              More options <span className="text-sm font-normal text-ink-muted">(picture, time, day)</span>
+            </span>
+            <span aria-hidden="true" className="text-xl text-ink-muted transition-transform group-open:rotate-180">
+              ⌄
+            </span>
+          </summary>
+          <div className="flex flex-col gap-5 border-t border-paper-line px-4 py-4">
+            <div role="group" aria-labelledby="icon-label" className="flex flex-col gap-2">
+              <span id="icon-label" className="text-[15px] font-semibold">
+                Picture
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {SESSION_ICONS.map((o) => (
+                  <button
+                    key={o.icon}
+                    type="button"
+                    aria-label={o.label}
+                    aria-pressed={s.icon === o.icon}
+                    title={o.label}
+                    onClick={() => updateSession(event.id, s.id, { icon: o.icon })}
+                    className={clsx(
+                      'flex h-12 w-12 items-center justify-center rounded-xl border-2 text-2xl',
+                      s.icon === o.icon ? 'border-brand bg-brand-tint' : 'border-paper-line bg-white hover:bg-paper-sunk',
+                    )}
+                  >
+                    <span aria-hidden="true">{o.icon}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="meal-time" className="text-[15px] font-semibold">
+                Time
+              </label>
+              <input
+                id="meal-time"
+                type="time"
+                disabled={s.time == null}
+                value={s.time ?? ''}
+                onChange={(e) => e.target.value && updateSession(event.id, s.id, { time: e.target.value })}
+                className={clsx(inputClass, 'disabled:bg-paper-sunk disabled:text-ink-faint')}
+              />
+              <Check
+                id="no-time"
+                label="No fixed time"
+                checked={s.time == null}
+                onChange={(v) => updateSession(event.id, s.id, { time: v ? null : '12:00' })}
+              />
+            </div>
+
+            {event.days.length > 1 && (
+              <div className="flex min-w-0 flex-col gap-1.5">
+                <label htmlFor="move-day" className="text-[15px] font-semibold">
+                  Move to another day
+                </label>
+                <select
+                  id="move-day"
+                  className={clsx(inputClass, 'min-w-0 max-w-full truncate')}
+                  value={day.id}
+                  onChange={(e) => {
+                    const target = event.days.find((d) => d.id === e.target.value);
+                    if (!target || target.id === day.id) return;
+                    moveSessionToDay(event.id, s.id, target.id);
+                    toast({
+                      text: `Moved ${s.name} to ${shortDate(target.date)}`,
+                    });
+                  }}
+                >
+                  {event.days.map((d, i) => (
+                    <option key={d.id} value={d.id}>
+                      Day {i + 1} · {shortDate(d.date)}
+                      {d.title ? ` · ${d.title}` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
-        )}
+        </details>
 
         <Button variant="danger" block icon={<IconTrash size={18} />} onClick={() => setConfirmRemove(true)}>
           Remove this meal
@@ -377,7 +412,12 @@ export default function SessionScreen() {
           navigate(menuUrl);
           removeSession(event.id, s.id);
           const hid = latestHistoryId();
-          toast({ text: `Removed ${name}`, actionLabel: 'Undo', duration: 8000, onAction: () => hid && undo(hid) });
+          toast({
+            text: `Removed ${name}`,
+            actionLabel: 'Undo',
+            duration: 8000,
+            onAction: () => hid && undo(hid),
+          });
         }}
       />
 
@@ -391,7 +431,10 @@ export default function SessionScreen() {
             size="lg"
             disabled={!headingText.trim()}
             onClick={() => {
-              addEntry(event.id, s.id, { kind: 'heading', text: headingText.trim() });
+              addEntry(event.id, s.id, {
+                kind: 'heading',
+                text: headingText.trim(),
+              });
               setHeadingOpen(false);
             }}
           >

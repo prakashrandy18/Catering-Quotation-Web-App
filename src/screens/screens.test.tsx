@@ -59,6 +59,17 @@ describe('Meal editor', () => {
     expect(now.pricing).toEqual({ mode: 'perLeaf', rate: 260 });
   });
 
+  it('keeps Time and Picture inside a closed "More options" disclosure', async () => {
+    const e = sampleEvent();
+    const brunch = sessionByName('Brunch');
+    renderApp(`/event/${e.id}/menu/${brunch.id}`);
+    const summary = screen.getByText('More options').closest('summary')!;
+    const details = summary.closest('details')!;
+    expect(details.open).toBe(false);
+    expect(details).toContainElement(screen.getByLabelText('Time', { selector: 'input' }));
+    expect(screen.getByRole('button', { name: 'Not in total' })).toBeInTheDocument();
+  });
+
   it('shows Price missing until a price is typed', async () => {
     const e = sampleEvent();
     const tiffin = sessionByName('Viratha Tiffin');
@@ -213,6 +224,18 @@ describe('New event', () => {
     expect(created.days[0].id).not.toBe(old.days[0].id);
     expect(created.days[0].sessions[0].id).not.toBe(old.days[0].sessions[0].id);
     expect(screen.getByTestId('where')).toHaveTextContent(`/event/${created.id}/menu`);
+  });
+
+  it('defaults to copying an old event, shows a DD-MM-YYYY readout and warns about days that will not be copied', async () => {
+    renderApp('/new');
+    expect(screen.getByLabelText('Copy an old event')).toBeChecked();
+    await fill('Short One');
+    fireEvent.change(screen.getByLabelText('To'), { target: { value: '2027-03-11' } });
+    expect(screen.getByText('Wed, 10 Mar 2027 (10-03-2027)')).toBeInTheDocument();
+    expect(screen.getAllByText('Tap to pick from the calendar')).toHaveLength(2);
+    expect(screen.getByText(/Day 3 \(26-02-2027, Brunch & Kattu Saatham\) will not be copied/)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('To'), { target: { value: '2027-03-12' } });
+    expect(screen.queryByText(/will not be copied/)).not.toBeInTheDocument();
   });
 
   it('makes a blank event with one day per date', async () => {

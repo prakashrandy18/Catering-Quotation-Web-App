@@ -101,8 +101,8 @@ export default function AddDishScreen() {
   const chipClass = 'min-h-[44px] rounded-full border border-paper-strong bg-white px-4 text-[15px] font-medium text-ink hover:bg-brand-tint';
 
   return (
-    <div className="pb-4">
-      <div className="sticky top-[61px] z-20 border-b border-paper-line bg-white">
+    <div className="flex min-h-[calc(100dvh-var(--event-header-h,61px)-80px-env(safe-area-inset-bottom))] flex-col md:min-h-[calc(100dvh-var(--event-header-h,61px)-24px)]">
+      <div className="sticky top-[var(--event-header-h,61px)] z-20 border-b border-paper-line bg-white">
         <div className="flex items-center gap-1 px-2 py-2">
           <div className="min-w-0 flex-1 pl-2">
             <h1 className="font-display text-lg font-semibold leading-tight">Add dish</h1>
@@ -136,7 +136,7 @@ export default function AddDishScreen() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 px-4 pt-4">
+      <div className="flex flex-col gap-4 px-4 pb-4 pt-4">
         {trimmed ? (
           <>
             {results.length > 0 && (
@@ -263,7 +263,7 @@ export default function AddDishScreen() {
         )}
       </div>
 
-      <div className="sticky bottom-[calc(64px+env(safe-area-inset-bottom))] z-10 mt-4 border-t border-paper-line bg-white px-4 py-3 md:bottom-0">
+      <div className="sticky bottom-[calc(64px+env(safe-area-inset-bottom))] z-10 mt-auto border-t border-paper-line bg-white px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] md:bottom-0">
         <ButtonLink to={editorUrl} size="lg" block>
           {addedHere.length > 0 ? `Done · ${addedHere.length} added` : 'Done'}
         </ButtonLink>
