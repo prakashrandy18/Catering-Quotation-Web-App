@@ -128,7 +128,7 @@ export default function ChatScreen() {
             : null;
 
   return (
-    <div className="flex min-h-[calc(100dvh-61px-80px-env(safe-area-inset-bottom))] flex-col md:min-h-[calc(100dvh-61px-24px)]">
+    <div className="flex min-h-[calc(100dvh-var(--event-header-h,61px)-80px-env(safe-area-inset-bottom))] flex-col md:min-h-[calc(100dvh-var(--event-header-h,61px)-24px)]">
       <div className="flex items-center gap-2 px-4 pt-3">
         <h1 className="flex-1 font-display text-lg font-semibold">Ask Claude</h1>
         {messages.length > 0 && (

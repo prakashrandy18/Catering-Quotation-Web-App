@@ -7,7 +7,7 @@ import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom
 import type { EventOutletContext } from '@/components/EventLayout';
 import { Button } from '@/components/ui/Button';
 import { Sheet } from '@/components/ui/Sheet';
-import { IconClose, IconDownload, IconMinus, IconPlus, IconShare, IconWarning, IconWhatsApp } from '@/components/ui/icons';
+import { IconClose, IconDownload, IconMinus, IconPlus, IconWarning, IconWhatsApp } from '@/components/ui/icons';
 import { useAppStore } from '@/store/useAppStore';
 import { toast } from '@/store/toast';
 import { missingPrices } from '@/lib/calc';
@@ -21,6 +21,22 @@ import PdfPages from './PdfPages';
 import VariantToggle, { VariantBanner } from './VariantToggle';
 
 type PendingAction = 'save' | 'send';
+
+/** Mouse-and-keyboard device (no touch screen) or a wide window: WhatsApp Web is a sensible next step. */
+function useDesktopLike(): boolean {
+  const q = () => {
+    if (typeof window === 'undefined') return false;
+    const fine = window.matchMedia?.('(pointer: fine)').matches ?? false;
+    return fine || window.innerWidth >= 1024;
+  };
+  const [v, setV] = useState(q);
+  useEffect(() => {
+    const on = () => setV(q());
+    window.addEventListener('resize', on);
+    return () => window.removeEventListener('resize', on);
+  }, []);
+  return v;
+}
 
 export default function PreviewScreen() {
   const { event } = useOutletContext<EventOutletContext>();
@@ -39,6 +55,10 @@ export default function PreviewScreen() {
   const [warnFor, setWarnFor] = useState<PendingAction | null>(null);
   const [markSent, setMarkSent] = useState(true);
   const [busy, setBusy] = useState<null | 'whatsapp' | 'save'>(null);
+  /** The browser could not share the file: it was downloaded instead, so we cannot know if it was sent. */
+  const [downloadedOnly, setDownloadedOnly] = useState(false);
+  const [confirmSent, setConfirmSent] = useState(false);
+  const desktopLike = useDesktopLike();
 
   const missing = useMemo(() => missingPrices(event), [event]);
   const fileName = pdfFileName(event.name, variant);
@@ -56,16 +76,27 @@ export default function PreviewScreen() {
     else go();
   };
 
-  const afterSuccess = useCallback(
-    (result: ShareResult, opts: { mark: boolean }) => {
-      if (result === 'cancelled') return;
-      incrementShareCount();
-      if (opts.mark && variant === 'client' && event.status === 'draft') setStatus(event.id, 'sent');
-    },
-    [event.id, event.status, incrementShareCount, setStatus, variant],
-  );
+  const markSentNow = useCallback(() => {
+    if (variant === 'client' && event.status === 'draft') setStatus(event.id, 'sent');
+  }, [event.id, event.status, setStatus, variant]);
 
-  const saveNow = async (opts: { mark: boolean }) => {
+  // ?send=1 (from the side pane) opens the share sheet straight away.
+  useEffect(() => {
+    if (params.get('send') !== '1') return;
+    const next = new URLSearchParams(params);
+    next.delete('send');
+    setParams(next, { replace: true });
+    guard('send', openShare);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const openShare = () => {
+    setDownloadedOnly(false);
+    setConfirmSent(false);
+    setShareOpen(true);
+  };
+
+  const saveNow = async () => {
     setBusy('save');
     try {
       const blob = await pdf.getLatest();
@@ -76,7 +107,7 @@ export default function PreviewScreen() {
         downloadPdfBlob(blob, event, variant);
         result = 'downloaded';
       }
-      afterSuccess(result, opts);
+      if (result !== 'cancelled') incrementShareCount();
       if (result === 'downloaded') toast({ text: `PDF saved: ${fileName}`, tone: 'success' });
       if (result !== 'cancelled') setShareOpen(false);
     } catch {
@@ -90,9 +121,13 @@ export default function PreviewScreen() {
     setBusy('whatsapp');
     try {
       const blob = await pdf.getLatest();
-      const result = await sharePdfBlob(blob, event, variant, shareMessage(event, variant));
-      afterSuccess(result, { mark: markSent });
+      const result = await sharePdfBlob(blob, event, variant, shareMessage(event, variant, brand));
+      if (result !== 'cancelled') incrementShareCount();
+      // Only a completed share counts as "sent". A plain download proves nothing.
+      if (result === 'shared' && markSent) markSentNow();
       if (result === 'downloaded') {
+        setDownloadedOnly(true);
+        setConfirmSent(false);
         toast({
           text: 'PDF saved. Open WhatsApp and attach it.',
           tone: 'success',
@@ -101,7 +136,7 @@ export default function PreviewScreen() {
       } else if (result === 'shared') {
         toast({ text: variant === 'client' ? 'Quote sent.' : 'Copy for chef sent.', tone: 'success' });
       }
-      if (result !== 'cancelled') setShareOpen(false);
+      if (result === 'shared') setShareOpen(false);
     } catch {
       toast({ text: 'Could not send the PDF. Please try again.', tone: 'error' });
     } finally {
@@ -167,11 +202,21 @@ export default function PreviewScreen() {
       {/* bottom action bar: above the phone tab bar, inline on tablets/laptops */}
       <div className="fixed inset-x-0 bottom-[calc(64px+env(safe-area-inset-bottom))] z-30 border-t border-paper-line bg-white px-4 py-2 md:sticky md:bottom-0 md:mx-0 md:rounded-2xl md:border md:py-3">
         <div className="mx-auto flex max-w-[900px] gap-2">
-          <Button variant="secondary" className="flex-1" icon={<IconDownload size={20} />} disabled={!ready || busy !== null} onClick={() => guard('save', () => void saveNow({ mark: false }))}>
+          <Button variant="secondary" className="min-w-0 flex-1 whitespace-nowrap px-3" icon={<IconDownload size={20} className="shrink-0" />} disabled={!ready || busy !== null} onClick={() => guard('save', () => void saveNow())}>
             Save PDF
           </Button>
-          <Button variant="primary" className="flex-[1.4]" icon={<IconShare size={20} />} disabled={!ready} onClick={() => guard('send', () => setShareOpen(true))}>
-            Send
+          <Button
+            variant="whatsapp"
+            aria-label="Send"
+            className="min-w-0 flex-[1.4] whitespace-nowrap px-3"
+            icon={<IconWhatsApp size={22} className="shrink-0" />}
+            disabled={!ready}
+            onClick={() => guard('send', openShare)}
+          >
+            <span className="flex flex-col items-start text-left leading-tight">
+              <span>Send</span>
+              <span className="text-[13px] font-medium opacity-95">WhatsApp or save</span>
+            </span>
           </Button>
         </div>
       </div>
@@ -188,7 +233,7 @@ export default function PreviewScreen() {
               className="min-h-[52px] flex-1 rounded-2xl border border-paper-strong bg-white font-semibold"
               onClick={() => {
                 setWarnFor(null);
-                if (missing[0]) navigate(`../menu/${missing[0].sessionId}`);
+                if (missing[0]) navigate(`/event/${event.id}/menu/${missing[0].sessionId}`);
               }}
             >
               Add price
@@ -199,8 +244,8 @@ export default function PreviewScreen() {
               onClick={() => {
                 const action = warnFor;
                 setWarnFor(null);
-                if (action === 'save') void saveNow({ mark: false });
-                else setShareOpen(true);
+                if (action === 'save') void saveNow();
+                else openShare();
               }}
             >
               Send anyway
@@ -209,8 +254,10 @@ export default function PreviewScreen() {
         }
       >
         <div className="flex gap-3 rounded-xl bg-warn-soft p-3 text-warn">
-          <IconWarning size={22} />
-          <p className="text-base">The quote will say “Rate to be confirmed” for these meals:</p>
+          <IconWarning size={22} className="shrink-0" />
+          <p className="text-base">
+            <strong>{missing.length === 1 ? '1 meal has no price yet' : `${missing.length} meals have no price yet`}.</strong> The quote will say “Rate to be confirmed” for {missing.length === 1 ? 'it' : 'these meals'}:
+          </p>
         </div>
         <ul className="mt-3 flex flex-col gap-1">
           {missing.map((m) => (
@@ -219,14 +266,14 @@ export default function PreviewScreen() {
                 type="button"
                 onClick={() => {
                   setWarnFor(null);
-                  navigate(`../menu/${m.sessionId}`);
+                  navigate(`/event/${event.id}/menu/${m.sessionId}`);
                 }}
                 className="flex min-h-[44px] w-full items-center justify-between rounded-xl px-2 text-left text-base hover:bg-paper-sunk"
               >
                 <span>
                   {m.sessionName} <span className="text-ink-muted">· Day {m.dayIndex + 1}</span>
                 </span>
-                <span className="text-sm font-semibold text-brand" aria-hidden="true">Open ›</span>
+                <span className="ml-2 shrink-0 whitespace-nowrap text-sm font-semibold text-brand" aria-hidden="true">Open ›</span>
               </button>
             </li>
           ))}
@@ -251,18 +298,49 @@ export default function PreviewScreen() {
             <Button variant="whatsapp" size="lg" className="justify-start" icon={<IconWhatsApp size={24} />} disabled={busy !== null} onClick={() => void sendWhatsApp()}>
               {busy === 'whatsapp' ? 'Opening…' : 'Send on WhatsApp'}
             </Button>
-            <Button variant="secondary" size="lg" className="justify-start" icon={<IconDownload size={22} />} disabled={busy !== null} onClick={() => void saveNow({ mark: markSent })}>
+            <Button variant="secondary" size="lg" className="justify-start" icon={<IconDownload size={22} />} disabled={busy !== null} onClick={() => void saveNow()}>
               {busy === 'save' ? 'Saving…' : 'Save PDF on phone'}
             </Button>
           </div>
-          {variant === 'client' ? (
+          {downloadedOnly && (
+            <div role="status" className="flex flex-col gap-3 rounded-2xl bg-brand-tint p-3">
+              <p className="text-base font-semibold">PDF saved on this device. It has not been sent yet.</p>
+              <p className="text-sm text-ink-muted">Open WhatsApp and attach the saved PDF, then come back here.</p>
+              {desktopLike && (
+                <a
+                  href="https://web.whatsapp.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-whatsapp px-4 font-semibold text-white no-underline hover:brightness-95"
+                >
+                  <IconWhatsApp size={22} /> Open WhatsApp Web
+                </a>
+              )}
+              {variant === 'client' && (
+                <label className="flex min-h-[48px] items-center gap-3 text-base">
+                  <input type="checkbox" checked={confirmSent} onChange={(e) => setConfirmSent(e.target.checked)} className="h-6 w-6 accent-[rgb(var(--brand))]" />
+                  <span>Mark as sent</span>
+                </label>
+              )}
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  if (confirmSent) markSentNow();
+                  setShareOpen(false);
+                }}
+              >
+                Done, I sent it
+              </Button>
+            </div>
+          )}
+          {variant === 'client' && !downloadedOnly ? (
             <label className="flex min-h-[48px] items-center gap-3 text-base">
               <input type="checkbox" checked={markSent} onChange={(e) => setMarkSent(e.target.checked)} className="h-6 w-6 accent-[rgb(var(--brand))]" />
               <span>Mark as sent</span>
             </label>
-          ) : (
+          ) : variant === 'chef' ? (
             <p className="text-sm text-ink-muted">The chef copy has no prices. The message names the chef so it is not mixed up with the client quote.</p>
-          )}
+          ) : null}
           {!canShareFiles() && (
             <p className="text-sm text-ink-muted">This browser cannot attach files to WhatsApp directly. The PDF will be saved; then attach it in WhatsApp.</p>
           )}

@@ -73,7 +73,14 @@ describe('helpers', () => {
   it('writes share messages that name the audience', () => {
     const e = buildSampleEvent(0);
     expect(compactDateRange(e)).toBe('24–26 Feb');
-    expect(shareMessage(e, 'client')).toBe('Thara Wedding quotation, 24–26 Feb. Please check.');
-    expect(shareMessage(e, 'chef')).toMatch(/^Hello Chef, Thara Wedding menu, 24–26 Feb\./);
+    const contact = { contactName: 'Akash R', businessName: 'Dream Light Event Management', contactPhone: '8122831347' };
+    const client = { ...e, clientName: 'Mrs Thara' };
+    expect(shareMessage(client, 'client', contact)).toBe(
+      'Dear Mrs Thara, please find the quotation for Thara Wedding (24–26 Feb). — Akash R, Dream Light Event Management, 8122831347',
+    );
+    expect(shareMessage({ ...e, clientName: '  ' }, 'client', contact)).toMatch(/^Dear Sir\/Madam, please find/);
+    expect(shareMessage(client, 'client')).toBe('Dear Mrs Thara, please find the quotation for Thara Wedding (24–26 Feb).');
+    expect(shareMessage(e, 'chef', contact)).toMatch(/^Hello Chef, Thara Wedding menu, 24–26 Feb\..*— Akash R, 8122831347$/);
+    expect(shareMessage(e, 'chef', contact)).not.toMatch(/Dream Light/);
   });
 });

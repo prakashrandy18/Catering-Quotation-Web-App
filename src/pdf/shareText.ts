@@ -1,4 +1,4 @@
-import type { CateringEvent, PdfVariant } from '@/types';
+import type { BrandSettings, CateringEvent, PdfVariant } from '@/types';
 import { parseDate } from '@/lib/format';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -14,13 +14,27 @@ export function compactDateRange(event: Pick<CateringEvent, 'days'>): string {
   return `${a.d} ${MONTHS[a.m - 1]}–${b.d} ${MONTHS[b.m - 1]}`;
 }
 
+export type ShareContact = Partial<Pick<BrandSettings, 'contactName' | 'businessName' | 'contactPhone'>>;
+
+function signature(contact: ShareContact | undefined, parts: (keyof ShareContact)[]): string {
+  return parts
+    .map((k) => (contact?.[k] ?? '').trim())
+    .filter(Boolean)
+    .join(', ');
+}
+
 /** Message sent with the PDF. Names the audience so the right copy goes to the right person. */
-export function shareMessage(event: CateringEvent, variant: PdfVariant): string {
+export function shareMessage(event: CateringEvent, variant: PdfVariant, contact?: ShareContact): string {
   const name = event.name.trim() || 'Event';
   const dates = compactDateRange(event);
-  const when = dates ? `, ${dates}` : '';
   if (variant === 'chef') {
-    return `Hello Chef, ${name} menu${when}. Please fill your rate per leaf in the price sheet on the last page and send it back.`;
+    const when = dates ? `, ${dates}` : '';
+    const sign = signature(contact, ['contactName', 'contactPhone']);
+    const body = `Hello Chef, ${name} menu${when}. Please fill your rate per leaf in the price sheet on the last page and send it back.`;
+    return sign ? `${body} — ${sign}` : body;
   }
-  return `${name} quotation${when}. Please check.`;
+  const who = event.clientName.trim() || 'Sir/Madam';
+  const sign = signature(contact, ['contactName', 'businessName', 'contactPhone']);
+  const body = `Dear ${who}, please find the quotation for ${name}${dates ? ` (${dates})` : ''}.`;
+  return sign ? `${body} — ${sign}` : body;
 }

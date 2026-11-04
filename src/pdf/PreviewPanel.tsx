@@ -3,11 +3,11 @@
  * Renders only the first 2 pages to keep memory low; the PDF tab shows everything.
  */
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
 import { toast } from '@/store/toast';
 import { Button } from '@/components/ui/Button';
-import { IconDownload } from '@/components/ui/icons';
+import { IconDownload, IconWhatsApp } from '@/components/ui/icons';
 import type { CateringEvent, PdfVariant } from '@/types';
 import { downloadPdfBlob } from './index';
 import { usePdfBlob } from './usePdfBlob';
@@ -43,6 +43,7 @@ function Panel({ event }: { event: CateringEvent }) {
   const pdf = usePdfBlob(event, brand, variant, { debounceMs: 800 });
   const [numPages, setNumPages] = useState(0);
   const [saving, setSaving] = useState(false);
+  const navigate = useNavigate();
 
   const save = async () => {
     setSaving(true);
@@ -62,13 +63,18 @@ function Panel({ event }: { event: CateringEvent }) {
     <div className="flex flex-col gap-3 p-4">
       <VariantToggle value={variant} onChange={setVariant} compact />
       <VariantBanner variant={variant} />
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-sm text-ink-muted" aria-live="polite">
           {pdf.loading ? 'Updating…' : numPages ? `Page 1–${Math.min(2, numPages)} of ${numPages}` : ''}
         </span>
+        <div className="flex gap-2">
         <Button variant="secondary" icon={<IconDownload size={18} />} disabled={!pdf.blob || saving} onClick={() => void save()}>
           Save PDF
         </Button>
+        <Button variant="whatsapp" aria-label="Send this PDF" icon={<IconWhatsApp size={20} />} disabled={!pdf.blob} onClick={() => navigate(`/event/${event.id}/pdf?v=${variant}&send=1`)}>
+          Send
+        </Button>
+        </div>
       </div>
       {pdf.error && (
         <div role="alert" className="flex flex-col items-center gap-2 rounded-xl bg-white p-4 text-center">

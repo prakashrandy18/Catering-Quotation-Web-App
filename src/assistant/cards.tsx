@@ -295,9 +295,9 @@ export function SetupCard() {
         Claude is not set up on this phone yet
       </h2>
       <p className="text-base leading-relaxed text-ink">
-        To change the menu by typing or speaking, the owner adds a Claude key once in <strong>Settings → Claude assistant</strong>.
+        To chat with Claude, a Claude key must be added once on this phone: <strong>Settings → Claude assistant → paste the key</strong>. Ask the person who set up this app if you don&apos;t have one.
       </p>
-      <p className="text-[15px] text-ink-muted">You can still edit everything by hand on the Menu tab.</p>
+      <p className="text-[15px] text-ink-muted">You can still change everything by hand in the Menu tab.</p>
       <div className="flex flex-wrap gap-2">
         <Link to="/settings" className={buttonClass('primary', 'md', 'no-underline')}>
           Open Settings

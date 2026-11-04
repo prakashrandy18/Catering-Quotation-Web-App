@@ -198,7 +198,13 @@ export async function registerScenarios(h) {
     check(/Open WhatsApp and attach it/.test(toastText), 'fallback toast tells the next step', toastText);
     const st = await appState(page);
     const ev = st.events.find((e) => e.name === 'Thara Wedding');
-    check(ev.status === 'sent', 'status → Sent after client send (Mark as sent default on)', ev.status);
+    check(ev.status === 'draft', 'status stays Not sent after a plain download (nothing proves it was sent)', ev.status);
+    const doneSheet = page.getByRole('dialog', { name: 'Send PDF' });
+    check(await doneSheet.getByRole('button', { name: 'Done, I sent it' }).isVisible(), 'download fallback offers "Done, I sent it"');
+    await doneSheet.getByText('Mark as sent').click();
+    await doneSheet.getByRole('button', { name: 'Done, I sent it' }).click();
+    const ev2 = (await appState(page)).events.find((e) => e.name === 'Thara Wedding');
+    check(ev2.status === 'sent', 'status → Sent after ticking Mark as sent + Done, I sent it', ev2.status);
 
     // Chef copy
     await page.getByRole('button', { name: 'Copy for chef (no prices)' }).first().click();
@@ -257,7 +263,7 @@ export async function registerScenarios(h) {
     const s = shares[0];
     check(s.files.length === 1 && s.files[0].type === 'application/pdf' && s.files[0].size > 10000, 'one PDF File shared', JSON.stringify(s.files));
     check(s.files[0].name === 'Thara Wedding – Quotation.pdf', 'shared file name', s.files[0].name);
-    check(!!s.text && /Thara Wedding quotation/.test(s.text), 'share message names the event + audience', s.text);
+    check(!!s.text && /please find the quotation for Thara Wedding/.test(s.text), 'share message names the event + audience', s.text);
     check(taps <= 3 + 1, `taps from Menu: ${taps} (+1 for the missing-price warning)`);
     const st = await appState(page);
     check(st.events[0].status === 'sent', 'event status becomes Sent');
