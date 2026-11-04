@@ -139,4 +139,6 @@ export interface ChatMessage {
   historyId?: ID;
   /** Rendered change list, e.g. [{sign:'-', text:'Vada Curry'}] */
   changes?: { sign: '+' | '-' | '~'; text: string; where?: string }[];
+  /** Structured card rendered by the assistant (proposal / result / choice). Owned by src/assistant. */
+  card?: unknown;
 }

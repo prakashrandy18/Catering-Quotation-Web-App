@@ -13,11 +13,13 @@ import SessionScreen from '@/screens/SessionScreen';
 import AddDishScreen from '@/screens/AddDishScreen';
 import HistoryScreen from '@/screens/HistoryScreen';
 import EventDetailsScreen from '@/screens/EventDetailsScreen';
-import SettingsScreen from '@/screens/SettingsScreen';
-import ChatScreen from '@/assistant/ChatScreen';
 
 // The PDF screen pulls in @react-pdf/renderer + pdf.js → load it only when needed.
 const PreviewScreen = lazy(() => import('@/pdf/PreviewScreen'));
+// The chat screen pulls in the Anthropic SDK → also lazy.
+const ChatScreen = lazy(() => import('@/assistant/ChatScreen'));
+// Settings embeds the Claude settings card (SDK) → lazy as well.
+const SettingsScreen = lazy(() => import('@/screens/SettingsScreen'));
 
 /**
  * Route map (HashRouter so it works on GitHub Pages):
@@ -48,10 +50,24 @@ export default function App() {
       <Routes>
         <Route path="/" element={<EventsScreen />} />
         <Route path="/new" element={<NewEventScreen />} />
-        <Route path="/settings" element={<SettingsScreen />} />
+        <Route
+          path="/settings"
+          element={
+            <Suspense fallback={<div className="p-6 text-ink-muted">Loading settings…</div>}>
+              <SettingsScreen />
+            </Suspense>
+          }
+        />
         <Route path="/event/:eventId" element={<EventLayout />}>
           <Route index element={<Navigate to="menu" replace />} />
-          <Route path="chat" element={<ChatScreen />} />
+          <Route
+            path="chat"
+            element={
+              <Suspense fallback={<div className="p-6 text-ink-muted">Loading chat…</div>}>
+                <ChatScreen />
+              </Suspense>
+            }
+          />
           <Route path="menu" element={<MenuScreen />} />
           <Route path="menu/:sessionId" element={<SessionScreen />} />
           <Route path="menu/:sessionId/add" element={<AddDishScreen />} />
