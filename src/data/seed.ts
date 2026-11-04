@@ -172,7 +172,7 @@ export const DEFAULT_BRAND: BrandSettings = {
   contactPhone: '8122831347',
   paymentTerms: '',
   chefNote:
-    'Please review the menu below for an upcoming wedding. Kindly share your best rate per leaf for each session. Write your rates in the price sheet on the last page and send it back to us.',
+    'Please review the menu below for an upcoming wedding. Kindly share your best rate per leaf for each meal. Write your rates in the price sheet on the last page and send it back to us.',
 };
 
 export const DEFAULT_ASSISTANT: AssistantSettings = {

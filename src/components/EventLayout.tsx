@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef } from 'react';
 import { Link, NavLink, Outlet, useLocation, useParams } from 'react-router-dom';
 import { useAppStore, useEvent } from '@/store/useAppStore';
 import { dateRangeLabel, formatINR } from '@/lib/format';
@@ -31,6 +31,24 @@ export default function EventLayout() {
   const setLastEvent = useAppStore((s) => s.setLastEvent);
   const location = useLocation();
   const onPdfTab = /\/pdf(\/|$)/.test(location.pathname);
+  const headerRef = useRef<HTMLElement>(null);
+
+  // Publish the header's real height (it grows with large text) so sticky sub-headers sit right below it.
+  useLayoutEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const set = () => document.documentElement.style.setProperty('--event-header-h', `${Math.ceil(el.getBoundingClientRect().height)}px`);
+    set();
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(set);
+    ro.observe(el);
+    return () => ro.disconnect();
+  });
+
+  // New screen → start at the top (HashRouter keeps the old scroll position otherwise).
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (event) setLastEvent(event.id);
@@ -52,7 +70,7 @@ export default function EventLayout() {
 
   return (
     <div className="flex min-h-dvh flex-col bg-paper">
-      <header className="sticky top-0 z-30 border-b border-paper-line bg-white/95 backdrop-blur">
+      <header ref={headerRef} className="sticky top-0 z-30 border-b border-paper-line bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-[1400px] items-center gap-1 px-2 py-2 md:px-4">
           <Link to="/" aria-label="Back to all events" className="flex h-11 w-11 items-center justify-center rounded-xl text-ink hover:bg-paper-sunk">
             <IconBack />
@@ -61,7 +79,7 @@ export default function EventLayout() {
             <div className="truncate font-display text-lg font-semibold leading-tight" data-testid="event-title">
               {event.name}
             </div>
-            <div className="truncate text-sm text-ink-muted">
+            <div className="text-sm leading-snug text-ink-muted">
               {dateRangeLabel(event.days)}
               {event.location ? ` · ${event.location}` : ''} · <span data-testid="header-total">{formatINR(total)}</span>
             </div>
@@ -98,7 +116,7 @@ export default function EventLayout() {
           <Outlet context={{ event } satisfies EventOutletContext} />
         </main>
         {!onPdfTab && (
-          <aside aria-label="Live PDF preview" className="sticky top-[61px] hidden h-[calc(100dvh-61px)] min-w-0 flex-1 overflow-y-auto bg-[#EDEDEA] md:block">
+          <aside aria-label="Live PDF preview" className="sticky top-[var(--event-header-h,61px)] hidden h-[calc(100dvh-var(--event-header-h,61px))] min-w-0 flex-1 overflow-y-auto bg-[#EDEDEA] md:block">
             <Suspense fallback={<div className="p-6 text-ink-muted">Loading preview…</div>}>
               <PreviewPanel event={event} />
             </Suspense>
