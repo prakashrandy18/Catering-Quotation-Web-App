@@ -19,6 +19,10 @@ interface SheetProps {
 export function Sheet({ open, onClose, title, children, footer }: SheetProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const openerRef = useRef<Element | null>(null);
+  // Parents pass inline closures: keep the latest in a ref so re-renders do not re-run the
+  // focus effect below (which would move focus back to the first button on every render).
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     if (!open) return;
@@ -33,7 +37,7 @@ export function Sheet({ open, onClose, title, children, footer }: SheetProps) {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        onClose();
+        onCloseRef.current();
       } else if (e.key === 'Tab') {
         const els = focusables();
         if (!els.length) return;
@@ -56,7 +60,7 @@ export function Sheet({ open, onClose, title, children, footer }: SheetProps) {
       document.body.style.overflow = prevOverflow;
       (openerRef.current as HTMLElement | null)?.focus?.();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
   return createPortal(

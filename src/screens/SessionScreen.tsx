@@ -315,7 +315,7 @@ export default function SessionScreen() {
             <ButtonLink to={`${base}/menu/${s.id}/add`} size="lg" icon={<IconPlus size={20} />} className="sm:flex-1">
               Add dish
             </ButtonLink>
-            <div className="flex gap-2 sm:flex-1">
+            <div className="flex flex-wrap gap-2 sm:flex-1">
               <Button variant="secondary" className="flex-1 border-dashed" onClick={() => addEntry(event.id, s.id, { kind: 'gap', text: '' })}>
                 Add blank space
               </Button>

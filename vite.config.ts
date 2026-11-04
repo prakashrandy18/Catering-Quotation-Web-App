@@ -50,12 +50,14 @@ self.addEventListener('fetch', (e) => {
           caches.open(CACHE).then((c) => c.put('./', copy));
           return res;
         })
-        .catch(() => caches.match('./').then((r) => r || caches.match('./index.html'))),
+        .catch(() => caches.match('./', { ignoreVary: true }).then((r) => r || caches.match('./index.html', { ignoreVary: true }))),
     );
     return;
   }
+  // ignoreVary: hosts may send "Vary: Origin" and module scripts are requested with an Origin header,
+  // which would make every precached file miss while offline.
   e.respondWith(
-    caches.match(req).then(
+    caches.match(req, { ignoreVary: true }).then(
       (hit) =>
         hit ||
         fetch(req).then((res) => {

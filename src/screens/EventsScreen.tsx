@@ -90,18 +90,19 @@ function EventCard({ event, onMenu }: { event: CateringEvent; onMenu: () => void
             </span>
           )}
         </span>
-        <span className="mt-3 grid grid-cols-[1fr_1fr_1.7fr] gap-2">
-          <span className="rounded-xl bg-paper-sunk px-3 py-2">
+        {/* wraps (Total on its own line) when the phone's text size is large, instead of overflowing */}
+        <span className="mt-3 flex flex-wrap gap-2">
+          <span className="min-w-0 grow basis-[3.5rem] rounded-xl bg-paper-sunk px-3 py-2">
             <span className="block text-[13px] text-ink-muted">Days</span>
             <span className="block font-semibold">{event.days.length}</span>
           </span>
-          <span className="rounded-xl bg-paper-sunk px-3 py-2">
+          <span className="min-w-0 grow basis-[3.5rem] rounded-xl bg-paper-sunk px-3 py-2">
             <span className="block text-[13px] text-ink-muted">Meals</span>
             <span className="block font-semibold">{sessionCount(event)}</span>
           </span>
-          <span className="rounded-xl bg-brand-soft px-3 py-2">
+          <span className="min-w-0 grow-[1.7] basis-[6rem] rounded-xl bg-brand-soft px-3 py-2">
             <span className="block text-[13px] text-brand-dark">Total</span>
-            <span className="block truncate font-bold text-brand-dark">{grandTotal(event) > 0 ? formatINR(grandTotal(event)) : '—'}</span>
+            <span className="block font-bold text-brand-dark [overflow-wrap:anywhere]">{grandTotal(event) > 0 ? formatINR(grandTotal(event)) : '—'}</span>
           </span>
         </span>
       </Link>
