@@ -1,0 +1,6 @@
+Emoji images in this folder are from Twemoji (https://github.com/jdecked/twemoji),
+Copyright 2019 Twitter, Inc and other contributors (2024 onwards: jdecked and contributors).
+Graphics licensed under CC-BY 4.0: https://creativecommons.org/licenses/by/4.0/
+
+Files were taken from the npm package emoji-datasource-twitter@16.0.0 (img/twitter/64/)
+and renamed to their code point without the U+FE0F variation selector.
