@@ -219,6 +219,11 @@ export async function registerScenarios(h) {
     check(!(await page.getByRole('dialog', { name: 'Some meals have no price' }).isVisible().catch(() => false)), 'no missing-price warning for the chef copy');
     const [dl2] = await Promise.all([page.waitForEvent('download', { timeout: 60000 }), sheet2.getByRole('button', { name: 'Send on WhatsApp' }).click()]);
     const chef = await savePdf(dl2, `chef-${tag}`);
+    // The sheet stays open after a download fallback ("saved, not sent yet"); the user closes it.
+    check(await sheet2.getByText('It has not been sent yet').isVisible().catch(() => false), 'download fallback says the chef PDF is saved, not sent');
+    await sheet2.getByRole('button', { name: 'Close' }).click();
+    await sheet2.waitFor({ state: 'detached' });
+    check(!(await page.getByRole('dialog').isVisible().catch(() => false)), 'share sheet closed');
     check(chef.name === 'Thara Wedding – Chef Price Request.pdf', 'file name "Thara Wedding – Chef Price Request.pdf"', chef.name);
     check(chef.head === '%PDF-', 'valid chef PDF');
     const c = chef.text;
