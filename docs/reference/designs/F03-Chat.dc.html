@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ask Claude</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2D5A12}a:hover{color:#1d3d0b}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FBFBF9; font-family: Inter, sans-serif; color: #1c1f1a; display: flex; flex-direction: column; overflow: hidden">
+  <header style="background: #fff; border-bottom: 1px solid #EEEEEA; padding: 12px 8px 12px; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: center; gap: 4px">
+      <a href="F01-Events.dc.html" aria-label="Back to events" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #1c1f1a"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+      <div style="flex: 1; min-width: 0"><div style="font: 600 17px Poppins, sans-serif">Thara Wedding</div><div style="font-size: 12px; color: #5b6156">24–26 Feb · Avadi · ₹6,00,000</div></div>
+      <a href="F10-History.dc.html" aria-label="Changes and undo" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #1c1f1a"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 12a9 9 0 103-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg></a>
+    </div>
+    <nav aria-label="Event sections" style="margin: 0 8px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; background: #EFEFEB; border-radius: 14px; padding: 4px">
+      <a href="F03-Chat.dc.html" aria-current="page" style="height: 40px; border-radius: 10px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; font: 600 14px Inter, sans-serif; color: {{brand}}; text-decoration: none">Ask Claude</a>
+      <a href="F07-Menu.dc.html" style="height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font: 500 14px Inter, sans-serif; color: #5b6156; text-decoration: none">Menu</a>
+      <a href="F05-Preview.dc.html" style="height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font: 500 14px Inter, sans-serif; color: #5b6156; text-decoration: none">PDF</a>
+    </nav>
+  </header>
+
+  <main style="flex: 1; overflow: hidden; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+    <div style="align-self: flex-start; max-width: 90%; font-size: 15px; line-height: 1.5; color: #3a3f36">Vanakkam! Tell me what to change — in English or Tamil. You can also tap the mic and speak.</div>
+
+    <div style="align-self: flex-end; max-width: 82%; background: {{brand}}; color: #fff; padding: 12px 14px; border-radius: 18px 18px 4px 18px; font-size: 15px; line-height: 1.45">Viratha tiffin la vada curry remove pannu, poori masala kilangu add pannu. Carrot halwa ku pathila Ashoka halwa.</div>
+
+    <div style="align-self: flex-start; width: 92%; display: flex; flex-direction: column; gap: 8px">
+      <div style="font-size: 15px; line-height: 1.45">Done. Viratha Tiffin is updated:</div>
+      <div style="background: #fff; border: 1px solid #E3E3DF; border-radius: 16px; overflow: hidden">
+        <div style="padding: 10px 14px; background: #F5F5F3; font: 600 13px Inter, sans-serif">Day 1 · Viratha Tiffin · 100 people</div>
+        <div style="padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; font-size: 14px">
+          <sc-for list="{{changes}}" as="c" hint-placeholder-count="4">
+            <div style="display: flex; gap: 10px; align-items: center"><span style="width: 22px; height: 22px; border-radius: 6px; background: {{c.bg}}; color: {{c.fg}}; display: flex; align-items: center; justify-content: center; font-weight: 700">{{c.sign}}</span><span style="text-decoration: {{c.deco}}; color: {{c.text}}; font-weight: {{c.weight}}">{{c.name}}</span></div>
+          </sc-for>
+        </div>
+        <div style="display: flex; border-top: 1px solid #EEEEEA">
+          <a href="F10-History.dc.html" style="flex: 1; height: 46px; display: flex; align-items: center; justify-content: center; font: 600 14px Inter, sans-serif; color: #5b6156; text-decoration: none">Undo</a>
+          <a href="F07-Menu.dc.html" style="flex: 1; height: 46px; border-left: 1px solid #EEEEEA; display: flex; align-items: center; justify-content: center; font: 600 14px Inter, sans-serif; color: {{brand}}; text-decoration: none">See in menu</a>
+        </div>
+      </div>
+      <div style="font-size: 13px; color: #5b6156">Total unchanged · ₹6,00,000</div>
+    </div>
+  </main>
+
+  <div style="padding: 8px 16px 0; display: flex; gap: 8px; overflow: hidden">
+    <a href="F04-Confirm.dc.html" style="height: 38px; padding: 0 14px; border-radius: 999px; border: 1px solid #E3E3DF; background: #fff; display: flex; align-items: center; font: 500 13px Inter, sans-serif; color: #1c1f1a; text-decoration: none; white-space: nowrap">+ New section</a>
+    <a href="F05-Preview.dc.html" style="height: 38px; padding: 0 14px; border-radius: 999px; border: 1px solid #E3E3DF; background: #fff; display: flex; align-items: center; font: 500 13px Inter, sans-serif; color: #1c1f1a; text-decoration: none; white-space: nowrap">Client PDF</a>
+    <a href="F05-Preview.dc.html" style="height: 38px; padding: 0 14px; border-radius: 999px; border: 1px solid #E3E3DF; background: #fff; display: flex; align-items: center; font: 500 13px Inter, sans-serif; color: #1c1f1a; text-decoration: none; white-space: nowrap">Chef PDF</a>
+  </div>
+  <form style="padding: 10px 16px 24px; display: flex; gap: 8px; align-items: center">
+    <label for="msg" style="position: absolute; left: -9999px">Message Claude</label>
+    <input id="msg" placeholder="Type or speak a change…" style="flex: 1; min-width: 0; height: 52px; border-radius: 999px; border: 1px solid #DADAD5; padding: 0 18px; font: 15px Inter, sans-serif; background: #fff">
+    <a href="F04-Confirm.dc.html" aria-label="Speak a change" style="width: 52px; height: 52px; flex-shrink: 0; border-radius: 999px; background: {{brand}}; color: #fff; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg></a>
+  </form>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"brand":{"editor":"color","default":"#2D5A12","options":["#2D5A12","#7A1F2B","#1F4E79","#B8860B"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const brand = this.props.brand ?? '#2D5A12';
+    const rm = (name) => ({ name, sign: '−', bg: '#FBE4E1', fg: '#A1281A', deco: 'line-through', text: '#5b6156', weight: 400 });
+    const add = (name) => ({ name, sign: '+', bg: '#E6EEDF', fg: brand, deco: 'none', text: '#1c1f1a', weight: 600 });
+    return { brand, changes: [rm('Vada Curry'), add('Poori Masala Kilangu'), rm('Carrot Halwa'), add('Ashoka Halwa')] };
+  }
+}
+</script>
+</body>
+</html>

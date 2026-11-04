@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Edit session</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2D5A12}a:hover{color:#1d3d0b}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FBFBF9; font-family: Inter, sans-serif; color: #1c1f1a; display: flex; flex-direction: column; overflow: hidden">
+  <header style="background: #fff; border-bottom: 1px solid #EEEEEA; padding: 12px 8px; display: flex; align-items: center; gap: 4px">
+    <a href="F07-Menu.dc.html" aria-label="Back to menu" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #1c1f1a"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+    <h1 style="flex: 1; margin: 0; font: 600 18px Poppins, sans-serif">Edit session</h1>
+    <a href="F07-Menu.dc.html" style="height: 44px; padding: 0 18px; border-radius: 12px; background: {{brand}}; color: #fff; display: flex; align-items: center; font: 600 15px Inter, sans-serif; text-decoration: none">Done</a>
+  </header>
+
+  <main style="flex: 1; overflow: hidden; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; flex-direction: column; gap: 6px"><label for="sn" style="font-size: 13px; font-weight: 600">Session name</label><input id="sn" value="Vilayadal Evening (Snacks)" style="height: 50px; border-radius: 14px; border: 1px solid #DADAD5; padding: 0 14px; font: 600 16px Inter, sans-serif; background: #fff"></div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+      <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0"><label for="dt" style="font-size: 13px; font-weight: 600">Date</label><input id="dt" value="25-02-2027" style="min-width: 0; height: 50px; border-radius: 14px; border: 1px solid #DADAD5; padding: 0 14px; font: 15px Inter, sans-serif; background: #fff"></div>
+      <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0"><label for="tm" style="font-size: 13px; font-weight: 600">Time</label><input id="tm" value="3:30 PM" style="min-width: 0; height: 50px; border-radius: 14px; border: 1px solid #DADAD5; padding: 0 14px; font: 15px Inter, sans-serif; background: #fff"></div>
+    </div>
+
+    <div style="background: #fff; border: 1px solid #E3E3DF; border-radius: 18px; padding: 12px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <span style="flex: 1; font-size: 14px; font-weight: 600">People</span>
+        <button onClick="{{pplDown}}" aria-label="Fewer people" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #DADAD5; background: #fff; font: 600 20px Inter, sans-serif; color: #1c1f1a">−</button>
+        <span style="width: 64px; text-align: center; font: 700 18px Poppins, sans-serif">{{people}}</span>
+        <button onClick="{{pplUp}}" aria-label="More people" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #DADAD5; background: #fff; font: 600 20px Inter, sans-serif; color: #1c1f1a">+</button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px">
+        <span style="flex: 1; font-size: 14px; font-weight: 600">Price per leaf</span>
+        <button onClick="{{priceDown}}" aria-label="Lower price" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #DADAD5; background: #fff; font: 600 20px Inter, sans-serif; color: #1c1f1a">−</button>
+        <span style="width: 64px; text-align: center; font: 700 18px Poppins, sans-serif">₹{{price}}</span>
+        <button onClick="{{priceUp}}" aria-label="Higher price" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #DADAD5; background: #fff; font: 600 20px Inter, sans-serif; color: #1c1f1a">+</button>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; background: #E6EEDF; border-radius: 12px; padding: 10px 12px"><span style="font-size: 13px; color: {{brand}}; font-weight: 600">Session total (auto)</span><span style="font: 700 18px Poppins, sans-serif; color: {{brand}}">{{total}}</span></div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px"><span style="font: 600 15px Poppins, sans-serif">Dishes ({{count}})</span><span style="font-size: 12px; color: #5b6156">Drag to reorder</span></div>
+    <ul style="list-style: none; margin: 0; padding: 0; background: #fff; border: 1px solid #E3E3DF; border-radius: 16px; overflow: hidden">
+      <sc-for list="{{items}}" as="d" hint-placeholder-count="6">
+        <li style="display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 4px 0 12px; border-bottom: 1px solid #F0F0EC">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#A9AEA3" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>
+          <span style="flex: 1; font-size: 15px">{{d.name}}</span>
+          <button onClick="{{d.remove}}" aria-label="Remove {{d.name}}" style="width: 44px; height: 44px; border: 0; background: none; color: #8a8f85"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </li>
+      </sc-for>
+    </ul>
+    <div style="display: flex; gap: 8px">
+      <a href="F09-AddDish.dc.html" style="flex: 1; height: 50px; border-radius: 14px; background: {{brand}}; color: #fff; display: flex; align-items: center; justify-content: center; font: 600 15px Inter, sans-serif; text-decoration: none">+ Add dish</a>
+      <button style="height: 50px; padding: 0 16px; border-radius: 14px; border: 1px dashed #9AA193; background: #fff; color: #5b6156; font: 600 14px Inter, sans-serif">+ Gap line</button>
+    </div>
+  </main>
+  <div style="padding: 4px 16px 24px; display: flex; justify-content: center">
+    <button style="height: 44px; padding: 0 16px; border: 0; background: none; color: #A1281A; font: 600 14px Inter, sans-serif">Delete this session</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"brand":{"editor":"color","default":"#2D5A12","options":["#2D5A12","#7A1F2B","#1F4E79","#B8860B"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { people: 200, price: 100, items: ['Mini Badusha', 'Mixture', 'Onion Pakoda', 'Tea', 'Coffee', 'Juice'] };
+  }
+  renderVals() {
+    const s = this.state;
+    const inr = (n) => '₹' + n.toLocaleString('en-IN');
+    return {
+      brand: this.props.brand ?? '#2D5A12',
+      people: s.people, price: s.price, total: inr(s.people * s.price), count: s.items.length,
+      pplUp: () => this.setState({ people: s.people + 10 }),
+      pplDown: () => this.setState({ people: Math.max(0, s.people - 10) }),
+      priceUp: () => this.setState({ price: s.price + 10 }),
+      priceDown: () => this.setState({ price: Math.max(0, s.price - 10) }),
+      items: s.items.map((name) => ({ name, remove: () => this.setState({ items: s.items.filter((x) => x !== name) }) }))
+    };
+  }
+}
+</script>
+</body>
+</html>

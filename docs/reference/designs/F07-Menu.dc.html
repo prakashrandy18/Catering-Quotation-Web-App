@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Menu manual edit</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2D5A12}a:hover{color:#1d3d0b}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F5F5F3; font-family: Inter, sans-serif; color: #1c1f1a; display: flex; flex-direction: column; overflow: hidden">
+  <header style="background: #fff; border-bottom: 1px solid #EEEEEA; padding: 12px 8px 12px; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: center; gap: 4px">
+      <a href="F01-Events.dc.html" aria-label="Back to events" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #1c1f1a"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+      <div style="flex: 1; min-width: 0"><div style="font: 600 17px Poppins, sans-serif">Thara Wedding</div><div style="font-size: 12px; color: #5b6156">24–26 Feb · Avadi · <a href="F02-NewEvent.dc.html" style="color: {{brand}}; font-weight: 600">Edit details</a></div></div>
+      <a href="F10-History.dc.html" aria-label="Changes and undo" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #1c1f1a"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 12a9 9 0 103-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg></a>
+    </div>
+    <nav aria-label="Event sections" style="margin: 0 8px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; background: #EFEFEB; border-radius: 14px; padding: 4px">
+      <a href="F03-Chat.dc.html" style="height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font: 500 14px Inter, sans-serif; color: #5b6156; text-decoration: none">Ask Claude</a>
+      <a href="F07-Menu.dc.html" aria-current="page" style="height: 40px; border-radius: 10px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; font: 600 14px Inter, sans-serif; color: {{brand}}; text-decoration: none">Menu</a>
+      <a href="F05-Preview.dc.html" style="height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font: 500 14px Inter, sans-serif; color: #5b6156; text-decoration: none">PDF</a>
+    </nav>
+  </header>
+
+  <div style="padding: 14px 16px 6px; display: flex; gap: 8px">
+    <sc-for list="{{days}}" as="d" hint-placeholder-count="3">
+      <button onClick="{{d.pick}}" style="flex: 1; height: 60px; border-radius: 14px; border: {{d.border}}; background: {{d.bg}}; color: {{d.fg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: Inter, sans-serif"><span style="font: 600 14px Poppins, sans-serif">{{d.label}}</span><span style="font-size: 11px; opacity: 0.85">{{d.total}}</span></button>
+    </sc-for>
+    <button aria-label="Add a day" style="width: 48px; height: 60px; border-radius: 14px; border: 1px dashed #B9B9B3; background: transparent; color: #5b6156; font: 600 20px Inter, sans-serif">+</button>
+  </div>
+  <div style="padding: 4px 20px 8px; font-size: 13px; color: #5b6156">{{dayTitle}}</div>
+
+  <main style="flex: 1; overflow: hidden; padding: 0 16px; display: flex; flex-direction: column; gap: 10px">
+    <sc-for list="{{sessions}}" as="s" hint-placeholder-count="4">
+      <a href="F08-Session.dc.html" style="display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 18px; padding: 14px 12px 14px 16px; text-decoration: none; color: #1c1f1a; box-shadow: 0 1px 2px rgba(0,0,0,0.05)">
+        <div style="flex: 1; min-width: 0">
+          <div style="display: flex; align-items: center; gap: 8px"><span style="font: 600 16px Poppins, sans-serif">{{s.name}}</span><sc-if value="{{s.isNew}}" hint-placeholder-val="{{ false }}"><span style="font: 600 10px Inter, sans-serif; color: {{brand}}; background: #E6EEDF; padding: 3px 7px; border-radius: 999px">NEW</span></sc-if></div>
+          <div style="font-size: 13px; color: #5b6156; margin-top: 3px">{{s.meta}}</div>
+        </div>
+        <span style="font-weight: 700; font-size: 14px; color: {{brand}}">{{s.amt}}</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9AA193" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      </a>
+    </sc-for>
+    <a href="F08-Session.dc.html" style="height: 52px; border-radius: 16px; border: 2px dashed #CFD9C9; display: flex; align-items: center; justify-content: center; font: 600 14px Inter, sans-serif; color: {{brand}}; text-decoration: none">+ Add session</a>
+  </main>
+
+  <div style="background: #fff; border-top: 1px solid #E3E3DF; padding: 12px 16px 28px; display: flex; align-items: center; gap: 12px">
+    <div style="flex: 1"><div style="font-size: 12px; color: #5b6156">Grand total</div><div style="font: 700 22px Poppins, sans-serif">₹6,00,000</div></div>
+    <a href="F05-Preview.dc.html" style="height: 52px; padding: 0 22px; border-radius: 16px; background: {{brand}}; color: #fff; display: flex; align-items: center; font: 600 15px Inter, sans-serif; text-decoration: none">See PDF</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"brand":{"editor":"color","default":"#2D5A12","options":["#2D5A12","#7A1F2B","#1F4E79","#B8860B"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { day: 1 }; }
+  renderVals() {
+    const brand = this.props.brand ?? '#2D5A12';
+    const data = [
+      { label: '24 Feb', total: '₹3,50,000', title: 'Day 1 · 24-02-2027 · Viratham & Reception', sessions: [
+        { name: 'Viratha Tiffin', meta: '8:00 AM · 100 people · 10 dishes', amt: '' },
+        { name: 'Viratha Lunch', meta: '12:30 PM · 100 people · 16 dishes', amt: '' },
+        { name: 'Evening Snacks', meta: '6:00 PM · 500 people · 5 dishes', amt: '' },
+        { name: 'Evening Beverages', meta: 'Unlimited · 6 drinks', amt: '' },
+        { name: 'Reception Dinner', meta: '8:00 PM · 800 people · 25 dishes', amt: '' } ] },
+      { label: '25 Feb', total: '₹2,15,000', title: 'Day 2 · 25-02-2027 · Muhurtham', sessions: [
+        { name: 'Muhurtham Tiffin', meta: '7:30 AM · 300 people · 12 dishes', amt: '' },
+        { name: 'Muhurtham Lunch', meta: '12:30 PM · 300 people · 23 dishes', amt: '' },
+        { name: 'Vilayadal Evening', meta: '3:30 PM · 200 people · 6 dishes', amt: '₹20,000', isNew: true },
+        { name: 'Muhurtham Dinner', meta: '7:00 PM · 100 people · 14 dishes', amt: '₹30,000' } ] },
+      { label: '26 Feb', total: '₹35,000', title: 'Day 3 · 26-02-2027 · Brunch & Kattu Saatham', sessions: [
+        { name: 'Brunch', meta: '10:00 AM · 100 people · 16 dishes', amt: '₹25,000' },
+        { name: 'Kattu Saatham', meta: '12:00 PM · 100 people · 6 items', amt: '₹10,000' } ] }
+    ];
+    const cur = data[this.state.day];
+    return {
+      brand,
+      dayTitle: cur.title,
+      sessions: cur.sessions.map((s) => ({ ...s, isNew: !!s.isNew })),
+      days: data.map((d, i) => {
+        const on = i === this.state.day;
+        return { label: d.label, total: d.total, border: on ? '0' : '1px solid #E3E3DF', bg: on ? brand : '#fff', fg: on ? '#fff' : '#1c1f1a', pick: () => this.setState({ day: i }) };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Brand and PDF settings</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2D5A12}a:hover{color:#1d3d0b}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FBFBF9; font-family: Inter, sans-serif; color: #1c1f1a; display: flex; flex-direction: column; overflow: hidden">
+  <header style="background: #fff; border-bottom: 1px solid #EEEEEA; padding: 12px 8px; display: flex; align-items: center; gap: 4px">
+    <a href="F01-Events.dc.html" aria-label="Back to events" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #1c1f1a"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+    <div style="flex: 1"><h1 style="margin: 0; font: 600 18px Poppins, sans-serif">Brand &amp; PDF</h1><div style="font-size: 12px; color: #5b6156">Changes apply to every PDF</div></div>
+  </header>
+
+  <main style="flex: 1; overflow: hidden; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px">
+    <div style="background: #fff; border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.1); overflow: hidden">
+      <div style="background: linear-gradient(#D7DFD3, #EEF1EC); padding: 16px; text-align: center">
+        <div style="font: 700 17px Poppins, sans-serif; color: {{color}}; line-height: 1.15">MARRIAGE PROPOSAL<br>QUOTATION</div>
+        <div style="font-size: 10px; color: {{color}}; margin-top: 4px">Dream Light Event Management</div>
+      </div>
+      <div style="padding: 8px 12px 10px"><div style="background: {{color}}; color: #fff; font: 700 10px Inter, sans-serif; padding: 5px 8px; border-radius: 2px">Day 1 &#160;24-02-2027 — Viratham &amp; Reception</div></div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 13px; font-weight: 600">Brand colour</span>
+      <div style="display: flex; gap: 10px; align-items: center">
+        <sc-for list="{{swatches}}" as="s" hint-placeholder-count="4">
+          <button onClick="{{s.pick}}" aria-label="{{s.name}}" style="width: 46px; height: 46px; border-radius: 14px; border: {{s.ring}}; background: {{s.hex}}; box-shadow: inset 0 0 0 2px #fff"></button>
+        </sc-for>
+        <button aria-label="Pick a custom colour" style="width: 46px; height: 46px; border-radius: 14px; border: 1px dashed #9AA193; background: #fff; font: 600 18px Inter, sans-serif; color: #5b6156">+</button>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 12px">
+      <div style="width: 52px; height: 52px; border-radius: 14px; background: {{color}}; color: #fff; display: flex; align-items: center; justify-content: center; font: 700 16px Poppins, sans-serif">DL</div>
+      <button style="height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid #DADAD5; background: #fff; font: 600 14px Inter, sans-serif; color: #1c1f1a">Change logo</button>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 5px"><label for="bn" style="font-size: 13px; font-weight: 600">Business name</label><input id="bn" value="Dream Light Event Management" style="height: 46px; border-radius: 12px; border: 1px solid #DADAD5; padding: 0 12px; font: 15px Inter, sans-serif; background: #fff"></div>
+    <div style="display: flex; flex-direction: column; gap: 5px"><label for="pt" style="font-size: 13px; font-weight: 600">PDF title</label><input id="pt" value="Marriage Proposal Quotation" style="height: 46px; border-radius: 12px; border: 1px solid #DADAD5; padding: 0 12px; font: 15px Inter, sans-serif; background: #fff"></div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+      <div style="display: flex; flex-direction: column; gap: 5px; min-width: 0"><label for="cn" style="font-size: 13px; font-weight: 600">Contact</label><input id="cn" value="Akash R" style="min-width: 0; height: 46px; border-radius: 12px; border: 1px solid #DADAD5; padding: 0 12px; font: 15px Inter, sans-serif; background: #fff"></div>
+      <div style="display: flex; flex-direction: column; gap: 5px; min-width: 0"><label for="ph" style="font-size: 13px; font-weight: 600">Phone</label><input id="ph" value="8122831347" style="min-width: 0; height: 46px; border-radius: 12px; border: 1px solid #DADAD5; padding: 0 12px; font: 15px Inter, sans-serif; background: #fff"></div>
+    </div>
+    <a href="#terms" style="display: flex; align-items: center; justify-content: space-between; min-height: 48px; padding: 0 12px; border-radius: 12px; border: 1px solid #DADAD5; background: #fff; font: 600 14px Inter, sans-serif; color: #1c1f1a; text-decoration: none">Payment terms &amp; chef note<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9AA193" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+  </main>
+
+  <div style="margin: 0 16px 24px; background: #F1F6EC; border-radius: 14px; padding: 10px 12px; display: flex; align-items: center; gap: 10px">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{color}}" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>
+    <span style="flex: 1; font-size: 13px; line-height: 1.35"><strong>Claude assistant is on.</strong> Tip: you can also say “brand colour maroon aakku”.</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"brand":{"editor":"color","default":"#2D5A12","options":["#2D5A12","#7A1F2B","#1F4E79","#B8860B"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { picked: null }; }
+  renderVals() {
+    const base = this.props.brand ?? '#2D5A12';
+    const color = this.state.picked ?? base;
+    const list = [
+      { name: 'Forest green', hex: '#2D5A12' },
+      { name: 'Maroon', hex: '#7A1F2B' },
+      { name: 'Royal blue', hex: '#1F4E79' },
+      { name: 'Temple gold', hex: '#8A6508' }
+    ];
+    return {
+      color,
+      swatches: list.map((s) => ({ ...s, ring: s.hex.toLowerCase() === color.toLowerCase() ? '3px solid #1c1f1a' : '3px solid transparent', pick: () => this.setState({ picked: s.hex }) }))
+    };
+  }
+}
+</script>
+</body>
+</html>

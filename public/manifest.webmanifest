@@ -1,0 +1,16 @@
+{
+  "name": "Catering Quote — Dream Light",
+  "short_name": "Catering Quote",
+  "description": "Edit catering menus and send quotation PDFs to clients and chefs.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FBFBF9",
+  "theme_color": "#2D5A12",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PDF preview</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2D5A12}a:hover{color:#1d3d0b}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #EDEDEA; font-family: Inter, sans-serif; color: #1c1f1a; display: flex; flex-direction: column; overflow: hidden">
+  <header style="background: #fff; border-bottom: 1px solid #EEEEEA; padding: 12px 8px 12px; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: center; gap: 4px">
+      <a href="F01-Events.dc.html" aria-label="Back to events" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #1c1f1a"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+      <div style="flex: 1; min-width: 0"><div style="font: 600 17px Poppins, sans-serif">Thara Wedding</div><div style="font-size: 12px; color: #5b6156">24–26 Feb · Avadi · ₹6,00,000</div></div>
+      <a href="F10-History.dc.html" aria-label="Changes and undo" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #1c1f1a"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 12a9 9 0 103-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg></a>
+    </div>
+    <nav aria-label="Event sections" style="margin: 0 8px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; background: #EFEFEB; border-radius: 14px; padding: 4px">
+      <a href="F03-Chat.dc.html" style="height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font: 500 14px Inter, sans-serif; color: #5b6156; text-decoration: none">Ask Claude</a>
+      <a href="F07-Menu.dc.html" style="height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font: 500 14px Inter, sans-serif; color: #5b6156; text-decoration: none">Menu</a>
+      <a href="F05-Preview.dc.html" aria-current="page" style="height: 40px; border-radius: 10px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; font: 600 14px Inter, sans-serif; color: {{brand}}; text-decoration: none">PDF</a>
+    </nav>
+  </header>
+
+  <div style="padding: 14px 16px 10px; display: flex; gap: 8px">
+    <button onClick="{{showClient}}" style="flex: 1; height: 44px; border-radius: 12px; border: {{clientBorder}}; background: {{clientBg}}; color: {{clientFg}}; font: 600 14px Inter, sans-serif">Client quote</button>
+    <button onClick="{{showChef}}" style="flex: 1; height: 44px; border-radius: 12px; border: {{chefBorder}}; background: {{chefBg}}; color: {{chefFg}}; font: 600 14px Inter, sans-serif">Chef version</button>
+  </div>
+
+  <main style="flex: 1; overflow: hidden; padding: 0 20px; display: flex; flex-direction: column; align-items: center; gap: 8px">
+    <div style="width: 100%; background: #fff; border-radius: 4px; box-shadow: 0 8px 24px rgba(0,0,0,0.14); overflow: hidden; font-size: 9px">
+      <div style="background: linear-gradient(#D7DFD3, #EEF1EC); padding: 20px 14px; text-align: center">
+        <div style="font: 700 17px Poppins, sans-serif; color: {{brand}}; line-height: 1.12; white-space: pre-line">{{pdfTitle}}</div>
+        <div style="font-size: 8px; color: {{brand}}; margin-top: 6px">Dream Light Event Management</div>
+      </div>
+      <div style="padding: 12px; display: flex; flex-direction: column; gap: 8px">
+        <sc-if value="{{chef}}" hint-placeholder-val="{{ false }}">
+          <div style="line-height: 1.5">Dear Chef, please share your best rate per leaf for each session in the price sheet on the last page.</div>
+        </sc-if>
+        <div style="background: {{brand}}; color: #fff; padding: 5px 8px; font-weight: 700; border-radius: 2px">Day 2 &#160;25-02-2027 — Muhurtham</div>
+        <div style="background: #F5F5F3; border-radius: 4px; padding: 8px">
+          <div style="font-weight: 700; font-size: 10px">Vilayadal Evening (Snacks) <span style="color: {{brand}}; font-weight: 600">200 People · 3:30 PM{{snackPrice}}</span></div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px 6px; margin-top: 6px"><span>• Mini Badusha</span><span>• Onion Pakoda</span><span>• Coffee</span><span>• Mixture</span><span>• Tea</span><span>• Juice</span></div>
+        </div>
+        <div style="background: #F5F5F3; border-radius: 4px; padding: 8px">
+          <div style="font-weight: 700; font-size: 10px">Muhurtham Dinner <span style="color: {{brand}}; font-weight: 600">100 People · 7:00 PM{{dinnerPrice}}</span></div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px 6px; margin-top: 6px">
+            <sc-for list="{{dinner}}" as="d" hint-placeholder-count="14"><span>• {{d}}</span></sc-for>
+          </div>
+        </div>
+        <sc-if value="{{client}}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; justify-content: space-between; border-top: 1px solid #E3E3DF; padding-top: 6px; font-weight: 700"><span>Day 2 subtotal</span><span>₹2,15,000</span></div>
+        </sc-if>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; font-size: 13px; color: #5b6156">
+      <button aria-label="Previous page" style="width: 44px; height: 44px; border-radius: 999px; border: 0; background: #fff; color: #1c1f1a; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+      Page 3 of 5
+      <button aria-label="Next page" style="width: 44px; height: 44px; border-radius: 999px; border: 0; background: #fff; color: #1c1f1a; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+  </main>
+
+  <div style="padding: 10px 16px 28px; background: #fff; border-top: 1px solid #E3E3DF; display: flex; gap: 8px">
+    <a href="F06-Share.dc.html" style="flex: 1; height: 56px; border-radius: 16px; border: 1px solid #DADAD5; display: flex; align-items: center; justify-content: center; font: 600 15px Inter, sans-serif; color: #1c1f1a; text-decoration: none">Download</a>
+    <a href="F06-Share.dc.html" style="flex: 1.4; height: 56px; border-radius: 16px; background: {{brand}}; display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 15px Inter, sans-serif; color: #fff; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v14"/></svg>Share</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"brand":{"editor":"color","default":"#2D5A12","options":["#2D5A12","#7A1F2B","#1F4E79","#B8860B"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { chef: false }; }
+  renderVals() {
+    const brand = this.props.brand ?? '#2D5A12';
+    const chef = this.state.chef;
+    const on = { b: '0', bg: brand, fg: '#fff' }, off = { b: '1px solid #DADAD5', bg: '#fff', fg: '#1c1f1a' };
+    const c = chef ? off : on, k = chef ? on : off;
+    return {
+      brand, chef, client: !chef,
+      pdfTitle: chef ? 'CATERING MENU\nPRICE REQUEST' : 'MARRIAGE PROPOSAL\nQUOTATION',
+      snackPrice: chef ? '' : ' · ₹100/leaf',
+      dinnerPrice: chef ? '' : ' · ₹300/leaf',
+      dinner: ['Jilebi','Kathirikai Karamani Podi Curry','White Rice','Paal Payasam','Chow Chow Kootu','Sambar','Curd Pachadi','Andhra Special Thakkali Oorugai','Rasam','Fruit Pachadi','Veg Vadai','Coconut Rice','Kose Poriyal','Papadam'],
+      clientBorder: c.b, clientBg: c.bg, clientFg: c.fg,
+      chefBorder: k.b, chefBg: k.bg, chefFg: k.fg,
+      showClient: () => this.setState({ chef: false }),
+      showChef: () => this.setState({ chef: true })
+    };
+  }
+}
+</script>
+</body>
+</html>

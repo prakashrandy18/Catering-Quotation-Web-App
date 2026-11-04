@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Changes and undo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2D5A12}a:hover{color:#1d3d0b}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FBFBF9; font-family: Inter, sans-serif; color: #1c1f1a; display: flex; flex-direction: column; overflow: hidden; position: relative">
+  <header style="background: #fff; border-bottom: 1px solid #EEEEEA; padding: 12px 8px; display: flex; align-items: center; gap: 4px">
+    <a href="F03-Chat.dc.html" aria-label="Back to event" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #1c1f1a"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+    <div style="flex: 1"><h1 style="margin: 0; font: 600 18px Poppins, sans-serif">Changes</h1><div style="font-size: 12px; color: #5b6156">Thara Wedding · every change is saved</div></div>
+  </header>
+
+  <main style="flex: 1; overflow: hidden; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+    <div style="font: 600 12px Inter, sans-serif; letter-spacing: 0.06em; text-transform: uppercase; color: #5b6156">Today</div>
+    <sc-for list="{{entries}}" as="e" hint-placeholder-count="5">
+      <article style="background: #fff; border: {{e.border}}; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; align-items: center; gap: 8px">
+          <span style="font: 600 11px Inter, sans-serif; padding: 3px 8px; border-radius: 999px; background: {{e.whoBg}}; color: {{e.whoFg}}">{{e.who}}</span>
+          <span style="font-size: 12px; color: #5b6156">{{e.when}}</span>
+          <sc-if value="{{e.latest}}" hint-placeholder-val="{{ false }}"><span style="margin-left: auto; font: 600 11px Inter, sans-serif; color: {{brand}}">Current</span></sc-if>
+        </div>
+        <div style="font-weight: 600; font-size: 15px">{{e.title}}</div>
+        <div style="font-size: 13px; color: #5b6156; line-height: 1.45">{{e.detail}}</div>
+        <sc-if value="{{e.canRestore}}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{e.restore}}" style="align-self: flex-start; height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid #DADAD5; background: #fff; font: 600 13px Inter, sans-serif; color: #1c1f1a">Undo this change</button>
+        </sc-if>
+      </article>
+    </sc-for>
+  </main>
+
+  <sc-if value="{{toast}}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position: absolute; left: 16px; right: 16px; bottom: 28px; background: #1c1f1a; color: #fff; border-radius: 14px; padding: 0 8px 0 16px; min-height: 56px; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.25)">
+      <span style="flex: 1; font-size: 14px">{{toastText}}</span>
+      <button onClick="{{dismiss}}" style="height: 44px; padding: 0 12px; border: 0; background: none; color: #CFE3BD; font: 600 14px Inter, sans-serif">Redo</button>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"brand":{"editor":"color","default":"#2D5A12","options":["#2D5A12","#7A1F2B","#1F4E79","#B8860B"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { undone: null }; }
+  renderVals() {
+    const brand = this.props.brand ?? '#2D5A12';
+    const list = [
+      { id: 1, who: 'Claude', when: 'Just now', title: 'Added Vilayadal Evening (Snacks)', detail: 'Day 2 · 3:30 PM · 200 people × ₹100 = +₹20,000' },
+      { id: 2, who: 'Claude', when: 'Earlier today', title: 'Viratha Tiffin updated', detail: '− Vada Curry, + Poori Masala Kilangu, − Carrot Halwa, + Ashoka Halwa' },
+      { id: 3, who: 'Claude', when: 'Earlier today', title: 'Reception Dinner updated', detail: '+ Veg Uthappam, + Kadai Mushroom, − Rava Dosai, − Paneer Butter Masala' },
+      { id: 4, who: 'You', when: 'Earlier today', title: 'Viratha Lunch updated', detail: '− Aamai Vadai, − Chapati, − Kurma, + Vazhaipoo Vadai, + Avarai Curry' }
+    ];
+    const u = this.state.undone;
+    const hit = list.find((e) => e.id === u);
+    return {
+      brand,
+      toast: !!hit,
+      toastText: hit ? 'Undone: ' + hit.title : '',
+      dismiss: () => this.setState({ undone: null }),
+      entries: list.map((e, i) => {
+        const isClaude = e.who === 'Claude';
+        return { ...e, latest: i === 0 && u !== e.id, canRestore: u !== e.id,
+          border: u === e.id ? '1px dashed #B9B9B3' : '1px solid #E3E3DF',
+          whoBg: isClaude ? '#1c1f1a' : '#E6EEDF', whoFg: isClaude ? '#fff' : brand,
+          restore: () => this.setState({ undone: e.id }) };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

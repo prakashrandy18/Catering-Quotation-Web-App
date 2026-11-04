@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Share PDF</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2D5A12}a:hover{color:#1d3d0b}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #4A4C47; font-family: Inter, sans-serif; color: #1c1f1a; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; position: relative">
+  <a href="F05-Preview.dc.html" aria-label="Close and go back to preview" style="position: absolute; inset: 0 0 auto 0; height: 250px"></a>
+  <div style="position: absolute; top: 40px; left: 40px; right: 40px; height: 220px; background: #8C8E88; border-radius: 4px"></div>
+
+  <section aria-label="Share PDF" style="position: relative; background: #fff; border-radius: 26px 26px 0 0; padding: 10px 20px 28px; display: flex; flex-direction: column; gap: 16px">
+    <div style="width: 40px; height: 5px; border-radius: 999px; background: #D6D6D1; align-self: center"></div>
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <h1 style="margin: 0; font: 600 20px Poppins, sans-serif">Share PDF</h1>
+      <a href="F05-Preview.dc.html" aria-label="Close" style="width: 44px; height: 44px; border-radius: 999px; background: #F5F5F3; color: #1c1f1a; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; background: #EFEFEB; border-radius: 14px; padding: 4px">
+      <button onClick="{{pickClient}}" style="height: 42px; border-radius: 10px; border: 0; background: {{clientBg}}; box-shadow: {{clientShadow}}; font: 600 14px Inter, sans-serif; color: {{clientFg}}">Client quote</button>
+      <button onClick="{{pickChef}}" style="height: 42px; border-radius: 10px; border: 0; background: {{chefBg}}; box-shadow: {{chefShadow}}; font: 600 14px Inter, sans-serif; color: {{chefFg}}">Chef version</button>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 12px; background: #F5F5F3; border-radius: 16px; padding: 12px">
+      <div style="width: 44px; height: 56px; border-radius: 6px; background: #fff; border: 1px solid #E3E3DF; color: {{brand}}; display: flex; align-items: center; justify-content: center; font: 700 11px Inter, sans-serif">PDF</div>
+      <div style="flex: 1; min-width: 0"><div style="font-weight: 600; font-size: 15px">{{fileName}}</div><div style="font-size: 12px; color: #5b6156; margin-top: 2px">{{fileSub}}</div></div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <button style="display: flex; align-items: center; gap: 14px; height: 60px; padding: 0 16px; border-radius: 16px; border: 0; background: #1F8F4E; color: #fff; font: 600 16px Inter, sans-serif; text-align: left"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 01-13.5 7.8L3 21l1.2-4.4A9 9 0 1121 12z"/></svg>Send on WhatsApp</button>
+      <button style="display: flex; align-items: center; gap: 14px; height: 56px; padding: 0 16px; border-radius: 16px; border: 1px solid #E3E3DF; background: #fff; color: #1c1f1a; font: 600 15px Inter, sans-serif; text-align: left"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg>Save to phone</button>
+      <button style="display: flex; align-items: center; gap: 14px; height: 56px; padding: 0 16px; border-radius: 16px; border: 1px solid #E3E3DF; background: #fff; color: #1c1f1a; font: 600 15px Inter, sans-serif; text-align: left"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 10a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg>Copy view-only link</button>
+    </div>
+
+    <label style="display: flex; align-items: center; gap: 12px; min-height: 48px; font-size: 15px">
+      <input type="checkbox" checked style="width: 22px; height: 22px; accent-color: {{brand}}">
+      <span>{{markLabel}}</span>
+    </label>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"brand":{"editor":"color","default":"#2D5A12","options":["#2D5A12","#7A1F2B","#1F4E79","#B8860B"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { chef: false }; }
+  renderVals() {
+    const brand = this.props.brand ?? '#2D5A12';
+    const chef = this.state.chef;
+    const sel = { bg: '#fff', sh: '0 1px 3px rgba(0,0,0,0.1)', fg: brand }, un = { bg: 'transparent', sh: 'none', fg: '#5b6156' };
+    const c = chef ? un : sel, k = chef ? sel : un;
+    return {
+      brand,
+      fileName: chef ? 'Thara Wedding – Chef Price Request.pdf' : 'Thara Wedding – Quotation.pdf',
+      fileSub: chef ? 'No prices · blank price sheet on last page' : 'With prices, totals and payment terms',
+      markLabel: chef ? 'Mark as “Sent to chef”' : 'Mark event as “Sent to client”',
+      clientBg: c.bg, clientShadow: c.sh, clientFg: c.fg,
+      chefBg: k.bg, chefShadow: k.sh, chefFg: k.fg,
+      pickClient: () => this.setState({ chef: false }),
+      pickChef: () => this.setState({ chef: true })
+    };
+  }
+}
+</script>
+</body>
+</html>
